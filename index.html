@@ -30,6 +30,9 @@
     --warn-soft:#FBEED2;
     --neg:#DD4B4B;
     --neg-soft:#FCE1E1;
+    --amber:#D9720C;
+    --amber-ink:#FFFFFF;
+    --amber-soft:#FBE7D2;
     --chart-1:#16A672;
     --chart-2:#4C5FE0;
     --shadow-sm: 0 1px 2px rgba(23,26,43,.06);
@@ -60,6 +63,9 @@
       --warn-soft:#3A2E17;
       --neg:#E36767;
       --neg-soft:#3A2020;
+      --amber:#E8923D;
+      --amber-ink:#1A1200;
+      --amber-soft:#3D2A12;
       --chart-1:#20A87A;
       --chart-2:#7480EE;
       --shadow-sm: 0 1px 2px rgba(0,0,0,.5);
@@ -85,6 +91,9 @@
     --warn-soft:#3A2E17;
     --neg:#E36767;
     --neg-soft:#3A2020;
+    --amber:#E8923D;
+    --amber-ink:#1A1200;
+    --amber-soft:#3D2A12;
     --chart-1:#20A87A;
     --chart-2:#7480EE;
     --shadow-sm: 0 1px 2px rgba(0,0,0,.5);
@@ -142,6 +151,8 @@
   .btn-primary:hover{ filter:brightness(1.06); }
   .btn-ghost{ background:transparent; box-shadow:none; }
   .btn-danger{ color:var(--neg); }
+  .btn-amber{ background:var(--amber); border-color:var(--amber); color:var(--amber-ink); }
+  .btn-amber:hover{ filter:brightness(1.06); }
   .btn-sm{ padding:6px 10px; font-size:12.5px; }
 
   .sync-pill{
@@ -246,6 +257,7 @@
   /* ---------- dossiers section ---------- */
   .dossiers-card{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); box-shadow:var(--shadow-sm); overflow:hidden; margin-bottom:14px; }
   .dossiers-head{ display:flex; align-items:center; justify-content:space-between; gap:14px; padding:18px 22px 0; flex-wrap:wrap; }
+  .dossiers-toolbar{ padding:12px 22px 0; }
   .tabs{ display:flex; gap:4px; background:var(--surface-2); padding:4px; border-radius:999px; }
   .tab{ border:none; background:transparent; padding:7px 14px; border-radius:999px; font-size:12.5px; font-weight:600; color:var(--ink-2); cursor:pointer; }
   .tab.active{ background:var(--surface); color:var(--ink); box-shadow:var(--shadow-sm); }
@@ -338,6 +350,66 @@
     padding:7px 9px; font-size:13px; margin-bottom:10px;
   }
   .paid-popover-actions{ display:flex; justify-content:flex-end; gap:8px; }
+
+  /* ---------- invoice helper (Préparer facture) ---------- */
+  .invoice-modal{
+    position:fixed; top:50%; left:50%; transform:translate(-50%,-50%) scale(.97); width:min(640px,92vw);
+    max-height:86vh; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg);
+    box-shadow:var(--shadow-lg); z-index:31; display:flex; flex-direction:column;
+    opacity:0; pointer-events:none; transition:opacity .18s ease, transform .18s ease;
+  }
+  .invoice-modal.open{ opacity:1; pointer-events:auto; transform:translate(-50%,-50%) scale(1); }
+  .invoice-modal-head{ display:flex; align-items:center; justify-content:space-between; padding:18px 20px; border-bottom:1px solid var(--border); flex-shrink:0; }
+  .invoice-modal-head h2{ font-size:17px; }
+  .invoice-modal-body{ padding:18px 20px; overflow-y:auto; }
+  .invoice-hint{ font-size:12.5px; color:var(--ink-3); margin-bottom:14px; }
+  .invoice-empty{ font-size:13px; color:var(--ink-3); padding:14px 0; }
+  .invoice-bulk-taux{
+    display:flex; align-items:center; gap:8px; flex-wrap:wrap; background:var(--surface-2); border-radius:var(--radius-sm);
+    padding:10px 12px; margin-bottom:12px; font-size:12.5px; color:var(--ink-2);
+  }
+  .invoice-bulk-taux input{ width:64px; border:1px solid var(--border); background:var(--surface); border-radius:6px; padding:5px 7px; text-align:right; }
+  .invoice-select-list{ display:flex; flex-direction:column; gap:2px; margin-bottom:16px; }
+  .invoice-row{
+    display:flex; align-items:center; gap:10px; padding:8px 6px; border-radius:var(--radius-sm); cursor:pointer;
+  }
+  .invoice-row:hover{ background:var(--surface-2); }
+  .invoice-row input[type="checkbox"]{ width:16px; height:16px; accent-color:var(--amber); flex-shrink:0; }
+  .invoice-row-name{ flex:1; font-size:13.5px; font-weight:600; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .invoice-row-meta{ font-size:12px; color:var(--ink-3); flex-shrink:0; }
+  .invoice-row-taux{ display:flex; align-items:center; gap:4px; font-size:12.5px; color:var(--ink-2); flex-shrink:0; }
+  .invoice-row-taux input{ width:48px; border:1px solid var(--border); background:var(--bg); border-radius:6px; padding:4px 6px; text-align:right; }
+  .invoice-taux-confirm{
+    display:flex; align-items:center; gap:8px; flex-wrap:wrap; font-size:12px; color:var(--ink-2);
+    background:var(--amber-soft); border-radius:var(--radius-sm); padding:8px 10px; margin:2px 6px 6px;
+  }
+  .invoice-results{ border-top:1px solid var(--border); padding-top:14px; display:flex; flex-direction:column; gap:12px; }
+  .invoice-item-card{ background:var(--surface-2); border-radius:var(--radius-md); padding:12px 14px; }
+  .invoice-item-card h4{ font-size:12px; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-3); margin-bottom:8px; font-family:var(--font-body); font-weight:700; }
+  .invoice-field{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding:5px 0; }
+  .invoice-field-label{ font-size:12px; color:var(--ink-3); flex-shrink:0; width:110px; }
+  .invoice-field-value{ display:flex; align-items:center; gap:8px; flex:1; min-width:0; justify-content:flex-end; }
+  .invoice-field-value span{ font-size:13px; font-variant-numeric:tabular-nums; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .btn-copy{
+    border:1px solid var(--border); background:var(--surface); color:var(--ink-2); font-size:11.5px; font-weight:600;
+    padding:4px 9px; border-radius:6px; cursor:pointer; flex-shrink:0;
+  }
+  .btn-copy:hover{ background:var(--surface-2); }
+  .btn-copy.copied{ background:var(--pos-soft); color:var(--pos); border-color:transparent; }
+
+  .invoice-comparison{ margin-top:18px; }
+  .invoice-comparison h4{ font-size:12px; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-3); margin-bottom:4px; font-family:var(--font-body); font-weight:700; }
+  .invoice-comparison-hint{ font-size:12px; color:var(--ink-3); margin-bottom:10px; }
+  .invoice-comparison table{ width:100%; border-collapse:collapse; font-size:13px; }
+  .invoice-comparison th{ text-align:right; font-size:11px; text-transform:uppercase; letter-spacing:.04em; color:var(--ink-3); font-weight:600; padding:0 8px 8px; border-bottom:1px solid var(--border); }
+  .invoice-comparison th:first-child{ text-align:left; }
+  .invoice-comparison td{ padding:7px 8px; border-bottom:1px solid var(--border); }
+  .invoice-comparison td.num{ text-align:right; font-variant-numeric:tabular-nums; }
+  .invoice-comparison tr.total td{ font-weight:700; border-top:1px solid var(--border); border-bottom:none; }
+  .invoice-diff-pos{ color:var(--pos); font-weight:700; }
+  .invoice-diff-neg{ color:var(--neg); font-weight:700; }
+  .invoice-diff-current{ color:var(--ink-3); font-style:italic; font-size:12px; }
+  .invoice-diff-zero{ color:var(--ink-3); }
 
   .toast-stack{ position:fixed; bottom:20px; left:50%; transform:translateX(-50%); z-index:40; display:flex; flex-direction:column; gap:8px; align-items:center; }
   .toast{ background:var(--ink); color:var(--bg); padding:10px 16px; border-radius:999px; font-size:13px; box-shadow:var(--shadow-lg); opacity:0; transform:translateY(6px); transition:all .18s ease; }
@@ -459,6 +531,7 @@
         <select id="yearSelect"></select>
       </div>
       <button class="btn btn-primary" id="btnNew">+ Nouveau dossier</button>
+      <button class="btn btn-amber" id="btnInvoiceHelperTop">🧾 Préparer facture</button>
       <button class="btn btn-ghost btn-sm" id="btnLogout" title="Se déconnecter">Déconnexion</button>
     </div>
   </header>
@@ -547,6 +620,9 @@
           </div>
           <input type="search" id="searchInput" placeholder="Rechercher un dossier…">
         </div>
+      </div>
+      <div class="dossiers-toolbar">
+        <button class="btn btn-amber btn-sm" id="btnInvoiceHelperTable">🧾 Préparer facture</button>
       </div>
       <div class="table-scroll">
         <table class="dossiers">
@@ -695,6 +771,25 @@
   </div>
 </div>
 
+<div class="scrim" id="invoiceScrim"></div>
+<div class="invoice-modal" id="invoiceModal" role="dialog" aria-modal="true" aria-labelledby="invoiceModalTitle">
+  <div class="invoice-modal-head">
+    <h2 id="invoiceModalTitle">🧾 Préparer facture</h2>
+    <button class="btn btn-ghost btn-sm" id="btnCloseInvoice" aria-label="Fermer">✕</button>
+  </div>
+  <div class="invoice-modal-body">
+    <div class="invoice-hint">Coche les dossiers « En attente » que tu vas facturer ce mois-ci — le détail à recopier dans Indy (Nom de l'item, Description, Prix unitaire HT) apparaît juste en dessous. La ligne « Participation 3 % » se calcule automatiquement sur l'ensemble de la sélection.</div>
+    <div class="invoice-bulk-taux" id="invoiceBulkTaux" hidden>
+      <span>Appliquer un taux à toute la sélection :</span>
+      <input type="number" id="invoiceBulkTauxInput" step="1" min="0" max="100" placeholder="%">
+      <button class="btn btn-sm" id="btnApplyBulkTaux">Appliquer</button>
+    </div>
+    <div class="invoice-select-list" id="invoiceSelectList"></div>
+    <div class="invoice-results" id="invoiceResults"></div>
+    <div class="invoice-comparison" id="invoiceComparison"></div>
+  </div>
+</div>
+
 <div class="toast-stack" id="toastStack"></div>
 
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
@@ -776,6 +871,13 @@
     dbReady: false,
     includeAttente: true,
     sortKey: 'createdAt_desc'
+  };
+
+  // état de l'outil « Préparer facture » — remis à zéro à chaque ouverture,
+  // c'est un espace de travail pour une session de facturation, pas une donnée persistée.
+  var invoiceHelper = {
+    selected: {},      // id -> true
+    tauxOverride: {}   // id -> taux en % tel que tapé dans l'aide à la facturation
   };
 
   /* ---------------- calculation engine ---------------- */
@@ -1480,6 +1582,317 @@
     setTimeout(function(){ savedEl.textContent=''; }, 2000);
   }
 
+  /* ---------------- aide à la facturation (« Préparer facture ») ---------------- */
+
+  // formate un nombre sans séparateur de milliers, avec virgule, en enlevant
+  // les zéros inutiles après la virgule (7500 -> "7500", 3312.5 -> "3312,5")
+  function rawFr(n){
+    var r = Math.round((Number(n)||0)*100)/100;
+    var s = r.toFixed(2).replace(/0+$/,'').replace(/\.$/,'');
+    return s.replace('.', ',');
+  }
+  // toujours deux chiffres après la virgule (utilisé pour la ligne Participation)
+  function fixed2Fr(n){
+    var r = Math.round((Number(n)||0)*100)/100;
+    return r.toFixed(2).replace('.', ',');
+  }
+
+  function invoiceEligibleDossiers(){
+    return yearDossiers().filter(function(d){ return d.statut === 'En attente'; });
+  }
+
+  // taux effectif pour un dossier dans l'aide à la facturation : la valeur
+  // tapée dans le champ (session en cours) sinon la valeur auto/enregistrée normale.
+  function invoiceResolvedTauxPct(d, autoRates){
+    return Math.round(computeDossier(d, autoRates, state.settings).taux * 10000) / 100;
+  }
+  function invoiceEffectiveTauxPct(d, autoRates){
+    var ov = invoiceHelper.tauxOverride[d.id];
+    return (ov !== undefined && !isNaN(ov)) ? Number(ov) : invoiceResolvedTauxPct(d, autoRates);
+  }
+  // reproduit la logique de computeDossier pour le prix unitaire HT (commission
+  // brute) et la participation, mais avec un taux éventuellement surchargé —
+  // la participation continue de ne s'appliquer qu'aux dossiers NORMAL.
+  function invoiceLineFor(d, autoRates){
+    var tauxPct = invoiceEffectiveTauxPct(d, autoRates);
+    var taux = tauxPct / 100;
+    var ttc = Number(d.honoraires) || 0;
+    var caHT = ttc / (1 + state.settings.tva);
+    var commissionBrute = caHT * taux;
+    var participationEUR = (d.type === 'NORMAL') ? commissionBrute * state.settings.participation : 0;
+    return { tauxPct: tauxPct, commissionBrute: commissionBrute, participationEUR: participationEUR };
+  }
+
+  // net à percevoir d'un dossier si on lui appliquait tel ou tel taux (%) —
+  // sert à comparer le taux actuellement appliqué avec les paliers du barème.
+  function invoiceNetAtTaux(d, tauxPct){
+    var taux = tauxPct / 100;
+    var ttc = Number(d.honoraires) || 0;
+    var caHT = ttc / (1 + state.settings.tva);
+    var commissionBrute = caHT * taux;
+    var participationEUR = (d.type === 'NORMAL') ? commissionBrute * state.settings.participation : 0;
+    var commissionNette = commissionBrute - participationEUR;
+    return commissionNette - commissionNette * state.settings.urssaf;
+  }
+
+  function invoiceFieldCard(title, fields){
+    return '<div class="invoice-item-card"><h4>'+escapeHTML(title)+'</h4>' +
+      fields.map(function(f){
+        return '<div class="invoice-field"><span class="invoice-field-label">'+escapeHTML(f.label)+'</span>'+
+          '<div class="invoice-field-value"><span>'+escapeHTML(f.value)+'</span>'+
+          '<button type="button" class="btn-copy" data-copy="'+escapeHTML(f.value)+'">Copier</button></div></div>';
+      }).join('') + '</div>';
+  }
+
+  function copyToClipboard(text, btn){
+    function ok(){
+      if (!btn) return;
+      var orig = btn.textContent;
+      btn.textContent = 'Copié !';
+      btn.classList.add('copied');
+      setTimeout(function(){ btn.textContent = orig; btn.classList.remove('copied'); }, 1500);
+    }
+    function fallback(){
+      try{
+        var ta = document.createElement('textarea');
+        ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+        document.body.appendChild(ta); ta.focus(); ta.select();
+        document.execCommand('copy'); document.body.removeChild(ta);
+        ok();
+      }catch(e){}
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(ok).catch(fallback);
+    } else { fallback(); }
+  }
+
+  function selectedInvoiceIds(){
+    return Object.keys(invoiceHelper.selected).filter(function(id){ return invoiceHelper.selected[id]; });
+  }
+
+  function renderInvoiceResults(){
+    var el = document.getElementById('invoiceResults');
+    var ids = selectedInvoiceIds();
+    if (!ids.length){
+      el.innerHTML = '<div class="invoice-empty">Coche au moins un dossier ci-dessus pour voir le détail à recopier dans Indy.</div>';
+      return;
+    }
+    var all = yearDossiers();
+    var autoRates = monthlyAutoRates(all, state.settings);
+    var byId = {};
+    state.dossiers.forEach(function(d){ byId[d.id] = d; });
+    var participationTotal = 0;
+    var cardsHtml = ids.map(function(id){
+      var d = byId[id];
+      if (!d) return '';
+      var line = invoiceLineFor(d, autoRates);
+      participationTotal += line.participationEUR;
+      var desc = 'Honoraires ' + rawFr(Number(d.honoraires)||0) + '€ (' + rawFr(line.tauxPct) + '%)';
+      return invoiceFieldCard(d.nom, [
+        { label: "Nom de l'item", value: d.nom },
+        { label: 'Description', value: desc },
+        { label: 'Prix unitaire HT', value: rawFr(line.commissionBrute) }
+      ]);
+    }).join('');
+    participationTotal = Math.round(participationTotal * 100) / 100;
+    var participationHtml = '';
+    if (participationTotal > 0){
+      participationHtml = invoiceFieldCard('Participation 3 % (sur l’ensemble de la sélection)', [
+        { label: "Nom de l'item", value: 'Participation 3% (*)' },
+        { label: 'Description', value: "*Retenue de 3 % au titre de la participation aux frais de communication et de la mise à disposition d'un poste de travail." },
+        { label: 'Prix unitaire HT', value: '-' + fixed2Fr(participationTotal) }
+      ]);
+    }
+    el.innerHTML = cardsHtml + participationHtml;
+    el.querySelectorAll('.btn-copy').forEach(function(btn){
+      btn.addEventListener('click', function(){ copyToClipboard(btn.getAttribute('data-copy'), btn); });
+    });
+  }
+
+  function invoiceDiffCellHtml(diff, isCurrentTier){
+    if (isCurrentTier) return '<td class="num invoice-diff-current">taux actuel</td>';
+    var rounded = Math.round(diff * 100) / 100;
+    if (Math.abs(rounded) < 0.005) return '<td class="num invoice-diff-zero">—</td>';
+    var cls = rounded > 0 ? 'invoice-diff-pos' : 'invoice-diff-neg';
+    var sign = rounded > 0 ? '+' : '−';
+    return '<td class="num '+cls+'">'+sign+fixed2Fr(Math.abs(rounded))+'€</td>';
+  }
+
+  // compare, pour chaque dossier NORMAL sélectionné, le net à percevoir au taux
+  // actuellement appliqué avec celui qu'il aurait à chaque palier du barème —
+  // seuls les dossiers NORMAL sont concernés, les paliers ne s'appliquant pas
+  // aux dossiers PRIME/APPORTEUR (taux libre, souvent 100 %).
+  function renderInvoiceComparison(){
+    var el = document.getElementById('invoiceComparison');
+    var ids = selectedInvoiceIds();
+    var byId = {};
+    state.dossiers.forEach(function(d){ byId[d.id] = d; });
+    var normalIds = ids.filter(function(id){ return byId[id] && byId[id].type === 'NORMAL'; });
+    if (!normalIds.length){ el.innerHTML = ''; return; }
+
+    var all = yearDossiers();
+    var autoRates = monthlyAutoRates(all, state.settings);
+    var tiers = [];
+    state.settings.seuils.forEach(function(s){
+      var p = Math.round(s.taux * 10000) / 100;
+      if (tiers.indexOf(p) === -1) tiers.push(p);
+    });
+    tiers.sort(function(a,b){ return a-b; });
+
+    var totals = tiers.map(function(){ return 0; });
+    var rowsHtml = normalIds.map(function(id){
+      var d = byId[id];
+      var line = invoiceLineFor(d, autoRates);
+      var currentNet = invoiceNetAtTaux(d, line.tauxPct);
+      var cells = tiers.map(function(tp, i){
+        var diff = invoiceNetAtTaux(d, tp) - currentNet;
+        totals[i] += diff;
+        return invoiceDiffCellHtml(diff, Math.abs(tp - line.tauxPct) <= 0.001);
+      }).join('');
+      return '<tr><td>'+escapeHTML(d.nom)+'</td>'+cells+'</tr>';
+    }).join('');
+
+    var totalsHtml = normalIds.length > 1
+      ? '<tr class="total"><td>Total</td>' + tiers.map(function(tp, i){ return invoiceDiffCellHtml(totals[i], false); }).join('') + '</tr>'
+      : '';
+
+    el.innerHTML =
+      '<h4>Écart selon le taux appliqué</h4>' +
+      '<div class="invoice-comparison-hint">Ce que tu gagnerais ou perdrais en net à percevoir si ce dossier était au palier indiqué, comparé au taux actuellement appliqué.</div>' +
+      '<table><thead><tr><th>Dossier</th>' + tiers.map(function(tp){ return '<th>'+rawFr(tp)+' %</th>'; }).join('') + '</tr></thead>' +
+      '<tbody>' + rowsHtml + totalsHtml + '</tbody></table>';
+  }
+
+  function renderInvoiceOutputs(){
+    renderInvoiceResults();
+    renderInvoiceComparison();
+  }
+
+  function updateInvoiceBulkTauxVisibility(){
+    document.getElementById('invoiceBulkTaux').hidden = selectedInvoiceIds().length < 2;
+  }
+
+  function invoiceConfirmRowFor(id){
+    return document.querySelector('.invoice-taux-confirm[data-confirm-id="'+id+'"]');
+  }
+
+  function renderInvoiceSelectList(){
+    var list = document.getElementById('invoiceSelectList');
+    var eligible = invoiceEligibleDossiers();
+    if (!eligible.length){
+      list.innerHTML = '<div class="invoice-empty">Aucun dossier en attente pour '+state.year+'.</div>';
+      document.getElementById('invoiceBulkTaux').hidden = true;
+      return;
+    }
+    var all = yearDossiers();
+    var autoRates = monthlyAutoRates(all, state.settings);
+
+    list.innerHTML = eligible.map(function(d){
+      var pct = invoiceEffectiveTauxPct(d, autoRates);
+      var checked = invoiceHelper.selected[d.id] ? 'checked' : '';
+      return '' +
+        '<div class="invoice-row" data-row-id="'+d.id+'">' +
+          '<input type="checkbox" data-invoice-id="'+d.id+'" '+checked+'>' +
+          '<span class="invoice-row-name">'+escapeHTML(d.nom)+'</span>' +
+          '<span class="invoice-row-meta">'+euroSmart(Number(d.honoraires)||0)+'</span>' +
+          '<span class="invoice-row-taux">' +
+            '<input type="number" class="invoice-taux-input" data-taux-id="'+d.id+'" value="'+(pct.toString())+'" step="1" min="0" max="100"> %' +
+          '</span>' +
+        '</div>' +
+        '<div class="invoice-taux-confirm" data-confirm-id="'+d.id+'" hidden>' +
+          '<span>Mettre aussi à jour ce taux sur le dossier&nbsp;?</span>' +
+          '<button type="button" class="btn btn-sm btn-primary" data-confirm="yes" data-id="'+d.id+'">Oui, mettre à jour</button>' +
+          '<button type="button" class="btn btn-sm btn-ghost" data-confirm="no" data-id="'+d.id+'">Non, juste ici</button>' +
+        '</div>';
+    }).join('');
+
+    list.querySelectorAll('.invoice-row').forEach(function(row){
+      var id = row.getAttribute('data-row-id');
+      var cb = row.querySelector('input[type="checkbox"]');
+      row.addEventListener('click', function(e){
+        if (e.target.closest('.invoice-taux-input')) return;
+        if (e.target === cb) return; // la case gère déjà son propre clic
+        cb.checked = !cb.checked;
+        cb.dispatchEvent(new Event('change'));
+      });
+      cb.addEventListener('change', function(){
+        if (cb.checked) invoiceHelper.selected[id] = true; else delete invoiceHelper.selected[id];
+        updateInvoiceBulkTauxVisibility();
+        renderInvoiceOutputs();
+      });
+    });
+
+    list.querySelectorAll('.invoice-taux-input').forEach(function(inp){
+      inp.addEventListener('click', function(e){ e.stopPropagation(); });
+      inp.addEventListener('change', function(){
+        var id = inp.getAttribute('data-taux-id');
+        var d = state.dossiers.find(function(x){ return x.id===id; });
+        if (!d) return;
+        var newPct = Number(inp.value);
+        if (isNaN(newPct)) return;
+        invoiceHelper.tauxOverride[id] = newPct;
+        renderInvoiceOutputs();
+        var storedPct = invoiceResolvedTauxPct(d, autoRates);
+        var confirmEl = invoiceConfirmRowFor(id);
+        if (confirmEl) confirmEl.hidden = Math.abs(newPct - storedPct) <= 0.001;
+      });
+    });
+
+    list.parentElement.querySelectorAll('.invoice-taux-confirm button[data-confirm]').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var id = btn.getAttribute('data-id');
+        if (btn.getAttribute('data-confirm') === 'yes'){
+          var d = state.dossiers.find(function(x){ return x.id===id; });
+          var pct = invoiceHelper.tauxOverride[id];
+          if (d && pct !== undefined && !isNaN(pct)){
+            d.taux = Number(pct) / 100;
+            render();
+            persistDossier(d);
+            toast('Taux mis à jour sur le dossier.');
+          }
+        }
+        var confirmEl = invoiceConfirmRowFor(id);
+        if (confirmEl) confirmEl.hidden = true;
+      });
+    });
+
+    updateInvoiceBulkTauxVisibility();
+  }
+
+  function applyBulkInvoiceTaux(){
+    var input = document.getElementById('invoiceBulkTauxInput');
+    var val = Number(input.value);
+    if (isNaN(val) || !input.value){ toast('Indique un taux valide.'); return; }
+    var ids = selectedInvoiceIds();
+    if (!ids.length) return;
+    ids.forEach(function(id){ invoiceHelper.tauxOverride[id] = val; });
+    renderInvoiceSelectList();
+    renderInvoiceOutputs();
+    var all = yearDossiers();
+    var autoRates = monthlyAutoRates(all, state.settings);
+    ids.forEach(function(id){
+      var d = state.dossiers.find(function(x){ return x.id===id; });
+      if (!d) return;
+      var storedPct = invoiceResolvedTauxPct(d, autoRates);
+      var confirmEl = invoiceConfirmRowFor(id);
+      if (confirmEl) confirmEl.hidden = Math.abs(val - storedPct) <= 0.001;
+    });
+    input.value = '';
+  }
+
+  function openInvoiceHelper(){
+    invoiceHelper.selected = {};
+    invoiceHelper.tauxOverride = {};
+    document.getElementById('invoiceScrim').classList.add('open');
+    document.getElementById('invoiceModal').classList.add('open');
+    renderInvoiceSelectList();
+    renderInvoiceOutputs();
+  }
+  function closeInvoiceHelper(){
+    document.getElementById('invoiceScrim').classList.remove('open');
+    document.getElementById('invoiceModal').classList.remove('open');
+  }
+
   /* ---------------- wiring ---------------- */
   function wire(){
     document.getElementById('btnNew').addEventListener('click', function(){ openDrawer(null); });
@@ -1488,7 +1901,17 @@
     document.getElementById('scrim').addEventListener('click', closeDrawer);
     document.getElementById('btnSave').addEventListener('click', saveDossier);
     document.getElementById('btnDelete').addEventListener('click', deleteDossier);
-    document.addEventListener('keydown', function(e){ if (e.key==='Escape') closeDrawer(); });
+    document.addEventListener('keydown', function(e){
+      if (e.key!=='Escape') return;
+      closeDrawer();
+      closeInvoiceHelper();
+    });
+
+    document.getElementById('btnInvoiceHelperTop').addEventListener('click', openInvoiceHelper);
+    document.getElementById('btnInvoiceHelperTable').addEventListener('click', openInvoiceHelper);
+    document.getElementById('btnCloseInvoice').addEventListener('click', closeInvoiceHelper);
+    document.getElementById('invoiceScrim').addEventListener('click', closeInvoiceHelper);
+    document.getElementById('btnApplyBulkTaux').addEventListener('click', applyBulkInvoiceTaux);
 
     document.getElementById('toggleIncludeAttente').addEventListener('change', function(e){
       state.includeAttente = e.target.checked;
