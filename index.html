@@ -535,8 +535,8 @@
           <div class="field-inline sort-field">
             <label for="sortSelect">Trier par</label>
             <select id="sortSelect">
-              <option value="createdAt_desc">Ajout (plus récent)</option>
-              <option value="createdAt_asc">Ajout (plus ancien)</option>
+              <option value="createdAt_desc">Activité (plus récente)</option>
+              <option value="createdAt_asc">Activité (plus ancienne)</option>
               <option value="dateNotaire_desc">Date notaire (récent → ancien)</option>
               <option value="dateNotaire_asc">Date notaire (ancien → récent)</option>
               <option value="honoraires_desc">Montant (élevé → faible)</option>
@@ -1110,12 +1110,22 @@
     return d.createdAt || creationTimeFromId(d.id) || d.dateNotaire || '';
   }
 
+  // Pour le tri "Activité" : un dossier Payé est trié sur sa date de paiement
+  // (celle saisie dans la popover "✓ Payé", = dateEncaissement) plutôt que sur
+  // sa date d'ajout au registre — sinon marquer un vieux dossier comme payé
+  // aujourd'hui ne le ferait jamais remonter en haut de l'onglet "Payés".
+  // Un dossier En attente / Abandon continue d'utiliser sa date d'ajout.
+  function dossierActivityAt(d){
+    if (d.statut === 'Payé' && d.dateEncaissement) return d.dateEncaissement;
+    return dossierCreatedAt(d);
+  }
+
   function sortComparator(sortKey){
     var parts = sortKey.split('_');
     var field = parts[0], dir = parts[1] === 'asc' ? 1 : -1;
     return function(a,b){
       var va, vb;
-      if (field === 'createdAt'){ va = dossierCreatedAt(a); vb = dossierCreatedAt(b); }
+      if (field === 'createdAt'){ va = dossierActivityAt(a); vb = dossierActivityAt(b); }
       else if (field === 'nom'){ va = (a.nom||'').toLowerCase(); vb = (b.nom||'').toLowerCase(); }
       else if (field === 'honoraires'){ va = Number(a.honoraires)||0; vb = Number(b.honoraires)||0; }
       else { va = a[field]||''; vb = b[field]||''; } // dateNotaire
