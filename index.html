@@ -1,0 +1,1685 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Registre Arthurimmo</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 42 42'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='2' y1='2' x2='40' y2='40' gradientUnits='userSpaceOnUse'%3E%3Cstop offset='0%25' stop-color='%234C5FE0'/%3E%3Cstop offset='100%25' stop-color='%2316A672'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='42' height='42' rx='11' fill='url(%23g)'/%3E%3Cg stroke='%23fff' stroke-linecap='round'%3E%3Ccircle cx='13.6' cy='27' r='5.4' fill='none' stroke-width='2.8'/%3E%3Cline x1='18.8' y1='27' x2='29' y2='27' stroke-width='2.8'/%3E%3Cline x1='24' y1='27' x2='24' y2='31.2' stroke-width='2.4'/%3E%3Cline x1='28' y1='27' x2='28' y2='30' stroke-width='2.4'/%3E%3C/g%3E%3Cg fill='%23fff'%3E%3Crect x='23' y='19' width='2.6' height='5' rx='1.3'/%3E%3Crect x='27.6' y='15' width='2.6' height='9' rx='1.3'/%3E%3Crect x='32.2' y='10.5' width='2.6' height='13.5' rx='1.3'/%3E%3C/g%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:opsz,wght@6..12,400;6..12,500;6..12,600;6..12,700;6..12,800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F5F6FA;
+    --surface:#FFFFFF;
+    --surface-2:#EEF0F6;
+    --border:#E1E4ED;
+    --ink:#171A2B;
+    --ink-2:#5B6178;
+    --ink-3:#9297AC;
+    --accent:#4C5FE0;
+    --accent-2:#16A672;
+    --accent-ink:#FFFFFF;
+    --accent-soft:#E7E9FB;
+    --pos:#16A672;
+    --pos-soft:#DDF3EA;
+    --warn:#B9800F;
+    --warn-soft:#FBEED2;
+    --neg:#DD4B4B;
+    --neg-soft:#FCE1E1;
+    --chart-1:#16A672;
+    --chart-2:#4C5FE0;
+    --shadow-sm: 0 1px 2px rgba(23,26,43,.06);
+    --shadow-lg: 0 16px 40px -20px rgba(23,26,43,.28);
+    --radius-lg: 18px;
+    --radius-md: 12px;
+    --radius-sm: 8px;
+    --font-display:'Nunito Sans', 'Segoe UI', Arial, sans-serif;
+    --font-body:'Nunito Sans', 'Segoe UI', Arial, sans-serif;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0E1020;
+      --surface:#171A2E;
+      --surface-2:#20233B;
+      --border:#2C304A;
+      --ink:#EDEFF7;
+      --ink-2:#B7BAD0;
+      --ink-3:#7D8199;
+      --accent:#7480EE;
+      --accent-2:#20A87A;
+      --accent-ink:#0E1020;
+      --accent-soft:#262B4A;
+      --pos:#20A87A;
+      --pos-soft:#163529;
+      --warn:#D9A54A;
+      --warn-soft:#3A2E17;
+      --neg:#E36767;
+      --neg-soft:#3A2020;
+      --chart-1:#20A87A;
+      --chart-2:#7480EE;
+      --shadow-sm: 0 1px 2px rgba(0,0,0,.5);
+      --shadow-lg: 0 20px 46px -20px rgba(0,0,0,.7);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0E1020;
+    --surface:#171A2E;
+    --surface-2:#20233B;
+    --border:#2C304A;
+    --ink:#EDEFF7;
+    --ink-2:#B7BAD0;
+    --ink-3:#7D8199;
+    --accent:#7480EE;
+    --accent-2:#20A87A;
+    --accent-ink:#0E1020;
+    --accent-soft:#262B4A;
+    --pos:#20A87A;
+    --pos-soft:#163529;
+    --warn:#D9A54A;
+    --warn-soft:#3A2E17;
+    --neg:#E36767;
+    --neg-soft:#3A2020;
+    --chart-1:#20A87A;
+    --chart-2:#7480EE;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,.5);
+    --shadow-lg: 0 20px 46px -20px rgba(0,0,0,.7);
+    color-scheme: dark;
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--font-body);
+    font-size:15px;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  ::selection{ background:var(--accent-soft); }
+  a{ color:inherit; }
+  button, input, select{ font-family:inherit; font-size:inherit; color:inherit; }
+  h1,h2,h3{ font-family:var(--font-display); font-weight:700; margin:0; text-wrap:balance; }
+  .num{ font-variant-numeric: tabular-nums; font-feature-settings:'tnum' 1; }
+  .app{ max-width:1320px; margin:0 auto; padding:22px 26px 80px; }
+
+  /* ---------- header ---------- */
+  header.topbar{
+    display:flex; align-items:flex-end; justify-content:space-between; gap:20px;
+    flex-wrap:wrap; margin-bottom:22px;
+  }
+  .brand{ display:flex; align-items:center; gap:12px; }
+  .brand-mark{
+    width:42px; height:42px; border-radius:11px; flex-shrink:0;
+    box-shadow:var(--shadow-sm);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .brand-mark svg{ display:block; width:100%; height:100%; }
+  .brand-text h1{ font-size:22px; }
+  .brand-text .sub{ color:var(--ink-3); font-size:12.5px; letter-spacing:.02em; margin-top:2px;}
+  .topbar-controls{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .field-inline{ display:flex; align-items:center; gap:6px; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-sm); padding:6px 10px; box-shadow:var(--shadow-sm);}
+  .field-inline label{ font-size:11.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--ink-3); }
+  .field-inline select{ border:none; background:transparent; font-weight:600; cursor:pointer; }
+  .field-inline select:focus-visible{ outline:2px solid var(--accent); border-radius:4px; }
+
+  .btn{
+    display:inline-flex; align-items:center; gap:7px; border:1px solid var(--border);
+    background:var(--surface); color:var(--ink); padding:9px 15px; border-radius:var(--radius-sm);
+    font-weight:600; font-size:13.5px; cursor:pointer; box-shadow:var(--shadow-sm);
+    transition:transform .12s ease, background .15s ease;
+  }
+  .btn:hover{ background:var(--surface-2); }
+  .btn:active{ transform:translateY(1px); }
+  .btn:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+  .btn-primary{ background:var(--accent); border-color:var(--accent); color:var(--accent-ink); }
+  .btn-primary:hover{ filter:brightness(1.06); }
+  .btn-ghost{ background:transparent; box-shadow:none; }
+  .btn-danger{ color:var(--neg); }
+  .btn-sm{ padding:6px 10px; font-size:12.5px; }
+
+  .sync-pill{
+    display:flex; align-items:center; gap:6px; font-size:12px; color:var(--ink-3);
+    padding:6px 10px; border-radius:999px; border:1px solid var(--border); background:var(--surface);
+  }
+  .sync-dot{ width:7px; height:7px; border-radius:50%; background:var(--ink-3); }
+  .sync-pill.live .sync-dot{ background:var(--pos); box-shadow:0 0 0 3px var(--pos-soft); }
+  .sync-pill.local .sync-dot{ background:var(--warn); box-shadow:0 0 0 3px var(--warn-soft); }
+
+  /* ---------- KPI grid ---------- */
+  .kpi-grid{
+    display:grid; grid-template-columns:repeat(4, 1fr); gap:12px; margin-bottom:14px;
+  }
+  .kpi-grid.secondary{ grid-template-columns:repeat(4,1fr); }
+  .net-summary-card{
+    display:flex; align-items:center; justify-content:space-between; gap:18px; flex-wrap:wrap;
+    margin-bottom:14px;
+  }
+  .net-summary-label{ font-size:12px; color:var(--ink-3); text-transform:uppercase; letter-spacing:.05em; margin-bottom:6px; }
+  .net-summary-values{ display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; }
+  .net-summary-annuel{ font-family:var(--font-display); font-size:28px; font-weight:700; color:var(--pos); }
+  .net-summary-mensuel{ font-size:13.5px; color:var(--ink-3); }
+  .net-summary-toggle{
+    display:flex; align-items:center; gap:9px; font-size:12.5px; color:var(--ink-2); cursor:pointer;
+    background:var(--surface-2); border:1px solid var(--border); border-radius:999px; padding:8px 14px;
+    flex-shrink:0; white-space:nowrap;
+  }
+  .net-summary-toggle input{ width:auto; accent-color:var(--accent); cursor:pointer; }
+  .status-row{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:14px; }
+  .status-tile{
+    background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-md);
+    padding:14px 16px; box-shadow:var(--shadow-sm); display:flex; align-items:center; gap:12px;
+  }
+  .status-tile .dot{ width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+  .status-tile.paye .dot{ background:var(--pos); }
+  .status-tile.attente .dot{ background:var(--warn); }
+  .status-tile.annule .dot{ background:var(--neg); }
+  .status-tile .count{ font-family:var(--font-display); font-size:26px; font-weight:700; }
+  .status-tile .label{ font-size:12px; color:var(--ink-3); text-transform:uppercase; letter-spacing:.05em; }
+
+  .kpi-tile{
+    background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-md);
+    padding:15px 16px; box-shadow:var(--shadow-sm); display:flex; flex-direction:column; gap:5px;
+    min-width:0;
+  }
+  .kpi-tile .label{ font-size:12px; color:var(--ink-3); text-transform:uppercase; letter-spacing:.05em; }
+  .kpi-tile .value{ font-family:var(--font-display); font-size:25px; font-weight:700; letter-spacing:-.01em; }
+  .kpi-tile .value.accent{ color:var(--accent); }
+  .kpi-tile .foot{ font-size:12px; color:var(--ink-3); }
+  .kpi-tile .foot.pos{ color:var(--pos); }
+  .kpi-tile .foot.warn{ color:var(--warn); }
+
+  /* ---------- panels / cards ---------- */
+  .panels{ display:grid; grid-template-columns:1.35fr 1fr; gap:14px; margin-bottom:14px; align-items:stretch; }
+  .card{
+    background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg);
+    padding:20px 22px; box-shadow:var(--shadow-sm);
+  }
+  .card-head{ display:flex; align-items:baseline; justify-content:space-between; gap:10px; margin-bottom:14px; }
+  .card-head h2{ font-size:16px; }
+  .card-head .hint{ font-size:12px; color:var(--ink-3); }
+  .legend{ display:flex; gap:14px; font-size:12px; color:var(--ink-2); }
+  .legend span{ display:inline-flex; align-items:center; gap:6px; }
+  .legend i{ width:9px; height:9px; border-radius:2px; display:inline-block; }
+
+  /* bar chart */
+  .chart-wrap{ position:relative; }
+  .chart-svg text{ font-family:var(--font-body); fill:var(--ink-3); font-size:10.5px; }
+  .chart-svg .axis-line{ stroke:var(--border); stroke-width:1; }
+  .bar{ transition:opacity .12s ease; cursor:pointer; }
+  .bar:hover{ opacity:.82; }
+  .tier-band{ opacity:.5; }
+  .chart-tooltip{
+    position:absolute; pointer-events:none; background:var(--ink); color:var(--bg);
+    padding:8px 10px; border-radius:8px; font-size:12px; box-shadow:var(--shadow-lg);
+    transform:translate(-50%,-115%); white-space:nowrap; opacity:0; transition:opacity .1s ease; z-index:5;
+    line-height:1.45;
+  }
+  :root[data-theme="dark"] .chart-tooltip, :root:not([data-theme="light"]) .chart-tooltip{ background:var(--surface-2); color:var(--ink); border:1px solid var(--border); }
+  .chart-tooltip.show{ opacity:1; }
+  .chart-tooltip b{ font-variant-numeric:tabular-nums; }
+
+  /* objectif + plafond */
+  .gauge-block + .gauge-block{ margin-top:18px; padding-top:18px; border-top:1px solid var(--border); }
+  .gauge-top{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:8px; }
+  .gauge-top .t{ font-size:13px; font-weight:600; }
+  .gauge-top .v{ font-family:var(--font-display); font-size:18px; font-weight:700; }
+  .bar-track{ height:10px; border-radius:999px; background:var(--surface-2); overflow:hidden; position:relative; }
+  .bar-fill{ height:100%; border-radius:999px; background:var(--accent); transition:width .5s cubic-bezier(.2,.8,.2,1); }
+  .bar-fill.pos{ background:var(--pos); }
+  .bar-track .marker{ position:absolute; top:-3px; bottom:-3px; width:2px; background:var(--ink); opacity:.35; }
+  .gauge-sub{ display:flex; justify-content:space-between; font-size:12px; color:var(--ink-3); margin-top:6px; }
+  .gauge-sub-stack{ display:flex; justify-content:space-between; margin-top:8px; }
+  .stack-item{ display:flex; flex-direction:column; gap:1px; }
+  .stack-item.align-right{ align-items:flex-end; }
+  .stack-primary{ font-size:13.5px; font-weight:700; color:var(--ink); }
+  .stack-secondary{ font-size:11.5px; color:var(--ink-3); }
+  .sim-row{ display:flex; align-items:center; gap:8px; margin-top:12px; font-size:12.5px; color:var(--ink-2); flex-wrap:wrap; }
+  .sim-row input{ width:88px; border:1px solid var(--border); border-radius:6px; padding:4px 7px; background:var(--surface); }
+
+  /* ---------- dossiers section ---------- */
+  .dossiers-card{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); box-shadow:var(--shadow-sm); overflow:hidden; margin-bottom:14px; }
+  .dossiers-head{ display:flex; align-items:center; justify-content:space-between; gap:14px; padding:18px 22px 0; flex-wrap:wrap; }
+  .tabs{ display:flex; gap:4px; background:var(--surface-2); padding:4px; border-radius:999px; }
+  .tab{ border:none; background:transparent; padding:7px 14px; border-radius:999px; font-size:12.5px; font-weight:600; color:var(--ink-2); cursor:pointer; }
+  .tab.active{ background:var(--surface); color:var(--ink); box-shadow:var(--shadow-sm); }
+  .tab:focus-visible{ outline:2px solid var(--accent); }
+  .search-row{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+  .sort-field select{ max-width:170px; }
+  .search-row input[type="search"]{
+    border:1px solid var(--border); background:var(--surface); border-radius:var(--radius-sm);
+    padding:8px 12px; width:220px;
+  }
+  .table-scroll{ overflow-x:auto; padding:16px 22px 20px; }
+  table.dossiers{ width:100%; border-collapse:collapse; min-width:760px; }
+  table.dossiers th{ text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-3); font-weight:600; padding:0 12px 10px; border-bottom:1px solid var(--border); }
+  table.dossiers td{ padding:12px; border-bottom:1px solid var(--border); font-size:13.5px; vertical-align:middle; }
+  table.dossiers tbody tr{ cursor:pointer; }
+  table.dossiers tbody tr:hover{ background:var(--surface-2); }
+  table.dossiers tbody tr:last-child td{ border-bottom:none; }
+  table.dossiers tfoot td{ padding:12px; font-weight:700; border-top:1px solid var(--border); }
+  .apporteurs-card{ margin-bottom:14px; }
+  .apporteurs-card table.dossiers tbody tr{ cursor:default; }
+  .apporteurs-card table.dossiers tbody tr:hover{ background:transparent; }
+  td.num, th.num{ text-align:right; font-variant-numeric:tabular-nums; }
+  .pill{ display:inline-flex; align-items:center; gap:5px; padding:3px 9px; border-radius:999px; font-size:11.5px; font-weight:600; }
+  .pill.paye{ background:var(--pos-soft); color:var(--pos); }
+  .pill.attente{ background:var(--warn-soft); color:var(--warn); }
+  .pill.annule{ background:var(--neg-soft); color:var(--neg); }
+  .type-tag{ font-size:11px; color:var(--ink-3); border:1px solid var(--border); border-radius:5px; padding:1px 6px; margin-left:6px; }
+  .empty-row td{ text-align:center; color:var(--ink-3); padding:30px 0; }
+
+  /* ---------- drawer ---------- */
+  .scrim{ position:fixed; inset:0; background:rgba(20,17,12,.42); backdrop-filter:blur(1px); opacity:0; pointer-events:none; transition:opacity .18s ease; z-index:20; }
+  .scrim.open{ opacity:1; pointer-events:auto; }
+  .drawer{
+    position:fixed; top:0; right:0; height:100%; width:min(460px,100%); background:var(--surface);
+    border-left:1px solid var(--border); box-shadow:var(--shadow-lg); transform:translateX(100%);
+    transition:transform .22s cubic-bezier(.2,.8,.2,1); z-index:21; display:flex; flex-direction:column;
+  }
+  .drawer.open{ transform:translateX(0); }
+  .drawer-head{ display:flex; align-items:center; justify-content:space-between; padding:18px 20px; border-bottom:1px solid var(--border); }
+  .drawer-head h2{ font-size:17px; }
+  .drawer-body{ padding:18px 20px; overflow-y:auto; flex:1; }
+  .drawer-foot{ padding:16px 20px; border-top:1px solid var(--border); display:flex; gap:8px; justify-content:space-between; }
+  .form-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .form-grid .full{ grid-column:1/-1; }
+  .form-field label{ display:block; font-size:11.5px; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-3); margin-bottom:5px; }
+  .form-field input, .form-field select{
+    width:100%; border:1px solid var(--border); background:var(--bg); border-radius:var(--radius-sm);
+    padding:9px 11px; font-size:13.5px;
+  }
+  .form-field input:focus-visible, .form-field select:focus-visible{ outline:2px solid var(--accent); outline-offset:1px; }
+  .form-field input:disabled{ color:var(--ink-3); background:var(--surface-2); cursor:not-allowed; }
+  .radio-group{ display:flex; gap:6px; }
+  .radio-group label{
+    flex:1; text-align:center; border:1px solid var(--border); border-radius:var(--radius-sm); padding:8px 4px;
+    font-size:12.5px; font-weight:600; cursor:pointer; color:var(--ink-2);
+  }
+  .radio-group input{ display:none; }
+  .radio-group input:checked + span{ color:var(--accent-ink); }
+  .radio-group label:has(input:checked){ background:var(--accent); border-color:var(--accent); color:var(--accent-ink); }
+
+  .preview{ margin-top:18px; background:var(--surface-2); border-radius:var(--radius-md); padding:14px 16px; }
+  .preview h3{ font-size:12px; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-3); margin-bottom:10px; font-family:var(--font-body); font-weight:700; }
+  .preview-row{ display:flex; justify-content:space-between; font-size:13px; padding:5px 0; }
+  .preview-row.total{ border-top:1px solid var(--border); margin-top:6px; padding-top:10px; font-weight:700; font-size:15px; }
+  .preview-row .l{ color:var(--ink-2); }
+  .preview-row .v{ font-variant-numeric:tabular-nums; }
+
+  /* ---------- settings ---------- */
+  details.settings{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); box-shadow:var(--shadow-sm); margin-bottom:30px; }
+  details.settings > summary{ list-style:none; cursor:pointer; padding:16px 22px; display:flex; align-items:center; justify-content:space-between; font-weight:600; font-size:14.5px; }
+  details.settings > summary::-webkit-details-marker{ display:none; }
+  details.settings > summary .chev{ transition:transform .18s ease; color:var(--ink-3); }
+  details.settings[open] > summary .chev{ transform:rotate(90deg); }
+  .settings-body{ padding:4px 22px 22px; display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
+  .settings-group h3{ font-size:12px; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-3); margin-bottom:10px; font-family:var(--font-body); font-weight:700; }
+  .settings-group .row{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:8px; }
+  .settings-group .row label{ font-size:13px; color:var(--ink-2); }
+  .settings-group .row input{ width:96px; border:1px solid var(--border); background:var(--bg); border-radius:6px; padding:6px 8px; text-align:right; }
+  .tier-row{ display:grid; grid-template-columns:1fr 1fr 60px; gap:6px; margin-bottom:6px; font-size:12.5px; }
+  .tier-row input{ border:1px solid var(--border); background:var(--bg); border-radius:6px; padding:5px 7px; width:100%; text-align:right; }
+  .settings-foot{ grid-column:1/-1; display:flex; justify-content:flex-end; gap:10px; padding-top:6px; border-top:1px solid var(--border); }
+
+  .paid-popover{
+    position:absolute; z-index:30; background:var(--surface); border:1px solid var(--border);
+    border-radius:var(--radius-md); box-shadow:var(--shadow-lg); padding:12px; width:220px;
+  }
+  .paid-popover-title{ font-size:11.5px; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-3); margin-bottom:6px; }
+  .paid-popover input[type="date"]{
+    width:100%; border:1px solid var(--border); background:var(--bg); border-radius:var(--radius-sm);
+    padding:7px 9px; font-size:13px; margin-bottom:10px;
+  }
+  .paid-popover-actions{ display:flex; justify-content:flex-end; gap:8px; }
+
+  .toast-stack{ position:fixed; bottom:20px; left:50%; transform:translateX(-50%); z-index:40; display:flex; flex-direction:column; gap:8px; align-items:center; }
+  .toast{ background:var(--ink); color:var(--bg); padding:10px 16px; border-radius:999px; font-size:13px; box-shadow:var(--shadow-lg); opacity:0; transform:translateY(6px); transition:all .18s ease; }
+  .toast.show{ opacity:1; transform:translateY(0); }
+
+  footer.note{ text-align:center; color:var(--ink-3); font-size:12px; margin-top:10px; }
+
+  @media (max-width:980px){
+    .kpi-grid{ grid-template-columns:repeat(2,1fr); }
+    .status-row{ grid-template-columns:1fr; }
+    .panels{ grid-template-columns:1fr; }
+    .settings-body{ grid-template-columns:1fr; }
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{ transition:none !important; animation:none !important; }
+  }
+
+  /* ---------- login ---------- */
+  .app{ display:none; }
+  .app.ready{ display:block; }
+  .login-overlay{
+    position:fixed; inset:0; background:var(--bg); display:flex; align-items:center; justify-content:center;
+    padding:20px; z-index:50;
+  }
+  .login-overlay[hidden]{ display:none; }
+  .login-card{
+    width:100%; max-width:360px; background:var(--surface); border:1px solid var(--border);
+    border-radius:var(--radius-lg); box-shadow:var(--shadow-lg); padding:28px 26px;
+  }
+  .login-card .brand{ justify-content:center; margin-bottom:20px; }
+  .login-error{ color:var(--neg); font-size:12.5px; min-height:16px; margin-top:10px; }
+  .login-hint{ color:var(--ink-3); font-size:12px; margin-top:14px; text-align:center; }
+  .btn-block{ width:100%; justify-content:center; }
+  .btn[disabled]{ opacity:.6; cursor:not-allowed; }
+</style>
+</head>
+<body>
+
+<div class="login-overlay" id="loginOverlay">
+  <div class="login-card">
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 42 42" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="logoGradLogin" x1="2" y1="2" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" style="stop-color:var(--accent)"></stop>
+              <stop offset="100%" style="stop-color:var(--accent-2)"></stop>
+            </linearGradient>
+          </defs>
+          <rect x="0" y="0" width="42" height="42" rx="11" fill="url(#logoGradLogin)"></rect>
+          <g stroke="var(--accent-ink)" stroke-linecap="round">
+            <circle cx="13.6" cy="27" r="5.4" fill="none" stroke-width="2.8"></circle>
+            <line x1="18.8" y1="27" x2="29" y2="27" stroke-width="2.8"></line>
+            <line x1="24" y1="27" x2="24" y2="31.2" stroke-width="2.4"></line>
+            <line x1="28" y1="27" x2="28" y2="30" stroke-width="2.4"></line>
+          </g>
+          <g fill="var(--accent-ink)">
+            <rect x="23" y="19" width="2.6" height="5" rx="1.3"></rect>
+            <rect x="27.6" y="15" width="2.6" height="9" rx="1.3"></rect>
+            <rect x="32.2" y="10.5" width="2.6" height="13.5" rx="1.3"></rect>
+          </g>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <h1>Registre de rémunération</h1>
+        <div class="sub">Arthurimmo &middot; auto-entrepreneur</div>
+      </div>
+    </div>
+    <form id="loginForm">
+      <div class="form-field full">
+        <label for="loginEmail">Adresse e-mail</label>
+        <input type="email" id="loginEmail" autocomplete="username" required>
+      </div>
+      <div class="form-field full" style="margin-top:12px;">
+        <label for="loginPassword">Mot de passe</label>
+        <input type="password" id="loginPassword" autocomplete="current-password" required>
+      </div>
+      <div class="login-error" id="loginError"></div>
+      <button class="btn btn-primary btn-block" type="submit" id="btnLoginSubmit" style="margin-top:10px;">Se connecter</button>
+    </form>
+    <div class="login-hint">Accès réservé &mdash; connecte-toi avec ton compte Arthurimmo.</div>
+  </div>
+</div>
+
+<div class="app" id="appRoot">
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 42 42" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="logoGrad" x1="2" y1="2" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" style="stop-color:var(--accent)"></stop>
+              <stop offset="100%" style="stop-color:var(--accent-2)"></stop>
+            </linearGradient>
+          </defs>
+          <rect x="0" y="0" width="42" height="42" rx="11" fill="url(#logoGrad)"></rect>
+          <g stroke="var(--accent-ink)" stroke-linecap="round">
+            <circle cx="13.6" cy="27" r="5.4" fill="none" stroke-width="2.8"></circle>
+            <line x1="18.8" y1="27" x2="29" y2="27" stroke-width="2.8"></line>
+            <line x1="24" y1="27" x2="24" y2="31.2" stroke-width="2.4"></line>
+            <line x1="28" y1="27" x2="28" y2="30" stroke-width="2.4"></line>
+          </g>
+          <g fill="var(--accent-ink)">
+            <rect x="23" y="19" width="2.6" height="5" rx="1.3"></rect>
+            <rect x="27.6" y="15" width="2.6" height="9" rx="1.3"></rect>
+            <rect x="32.2" y="10.5" width="2.6" height="13.5" rx="1.3"></rect>
+          </g>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <h1>Registre de rémunération</h1>
+        <div class="sub">Arthurimmo &middot; auto-entrepreneur</div>
+      </div>
+    </div>
+    <div class="topbar-controls">
+      <span class="sync-pill" id="syncPill"><span class="sync-dot"></span><span id="syncLabel">Connexion…</span></span>
+      <div class="field-inline">
+        <label for="yearSelect">Année</label>
+        <select id="yearSelect"></select>
+      </div>
+      <button class="btn btn-primary" id="btnNew">+ Nouveau dossier</button>
+      <button class="btn btn-ghost btn-sm" id="btnLogout" title="Se déconnecter">Déconnexion</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="status-row" id="statusRow"></section>
+
+    <section class="kpi-grid" id="kpiGrid"></section>
+
+    <section class="card net-summary-card" id="netSummaryCard">
+      <div class="net-summary-main">
+        <div class="net-summary-label">Net réel encaissé (après TVA &amp; URSSAF)</div>
+        <div class="net-summary-values">
+          <span class="net-summary-annuel num" id="netReelAnnuel"></span>
+          <span class="net-summary-mensuel num" id="netReelMensuel"></span>
+        </div>
+      </div>
+      <label class="net-summary-toggle">
+        <input type="checkbox" id="toggleIncludeAttente" checked>
+        <span>Inclure les dossiers en attente</span>
+      </label>
+    </section>
+
+    <section class="panels">
+      <div class="card">
+        <div class="card-head">
+          <h2>Facturation par mois notaire</h2>
+          <div class="legend" id="chartLegend"></div>
+        </div>
+        <div class="chart-wrap">
+          <svg class="chart-svg" id="chartSvg" viewBox="0 0 640 260" preserveAspectRatio="xMidYMid meet"></svg>
+          <div class="chart-tooltip" id="chartTooltip"></div>
+        </div>
+        <div class="hint" style="margin-top:8px;">Le taux automatique (53 / 55 / 60&nbsp;%) s'applique au cumul TTC signé dans chaque mois notaire.</div>
+      </div>
+
+      <div class="card">
+        <div class="gauge-block">
+          <div class="gauge-top"><span class="t">Objectif net annuel</span><span class="v" id="objTarget"></span></div>
+          <div class="hint" id="objTargetMensuel" style="margin:-4px 0 8px;"></div>
+          <div class="bar-track"><div class="bar-fill pos" id="objFill"></div></div>
+          <div class="gauge-sub"><span id="objNow"></span><span id="objStatus"></span></div>
+          <div class="sim-row">
+            Ventes à faire si honoraires de
+            <input type="text" inputmode="numeric" id="simHonoraires" value="5 000">
+            <span>€ :</span> <b id="simResult" class="num"></b>
+          </div>
+        </div>
+        <div class="gauge-block">
+          <div class="gauge-top"><span class="t">Plafond auto-entrepreneur</span><span class="v" id="plafondPct"></span></div>
+          <div class="bar-track"><div class="bar-fill" id="plafondFill"></div></div>
+          <div class="gauge-sub-stack">
+            <div class="stack-item">
+              <span class="stack-primary" id="plafondUsedTTC"></span>
+              <span class="stack-secondary" id="plafondUsedHT"></span>
+            </div>
+            <div class="stack-item align-right">
+              <span class="stack-primary" id="plafondLeftTTC"></span>
+              <span class="stack-secondary" id="plafondLeftHT"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="dossiers-card">
+      <div class="dossiers-head">
+        <div class="tabs" id="tabs">
+          <button class="tab active" data-tab="attente">En attente</button>
+          <button class="tab" data-tab="paye">Payés</button>
+          <button class="tab" data-tab="tous">Tous</button>
+        </div>
+        <div class="search-row">
+          <div class="field-inline sort-field">
+            <label for="sortSelect">Trier par</label>
+            <select id="sortSelect">
+              <option value="createdAt_desc">Ajout (plus récent)</option>
+              <option value="createdAt_asc">Ajout (plus ancien)</option>
+              <option value="dateNotaire_desc">Date notaire (récent → ancien)</option>
+              <option value="dateNotaire_asc">Date notaire (ancien → récent)</option>
+              <option value="honoraires_desc">Montant (élevé → faible)</option>
+              <option value="honoraires_asc">Montant (faible → élevé)</option>
+              <option value="nom_asc">Nom (A → Z)</option>
+              <option value="nom_desc">Nom (Z → A)</option>
+            </select>
+          </div>
+          <input type="search" id="searchInput" placeholder="Rechercher un dossier…">
+        </div>
+      </div>
+      <div class="table-scroll">
+        <table class="dossiers">
+          <thead>
+            <tr>
+              <th>Dossier</th>
+              <th>Statut</th>
+              <th>Mois notaire</th>
+              <th class="num">Honoraires TTC</th>
+              <th class="num">Taux</th>
+              <th class="num">Net à percevoir</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="card apporteurs-card" id="apporteursCard" hidden>
+      <div class="card-head">
+        <h2>Apporteurs d'affaire</h2>
+        <div class="hint">Déjà compté dans ton objectif annuel et ton plafond auto-entrepreneur</div>
+      </div>
+      <div class="table-scroll">
+        <table class="dossiers" id="apporteursTable">
+          <thead>
+            <tr>
+              <th>Partenaire</th>
+              <th class="num">Dossiers</th>
+              <th class="num">Honoraires TTC</th>
+              <th class="num">Net à percevoir</th>
+            </tr>
+          </thead>
+          <tbody id="apporteursBody"></tbody>
+          <tfoot id="apporteursFoot"></tfoot>
+        </table>
+      </div>
+    </section>
+
+    <details class="settings">
+      <summary>Paramètres &amp; barème <span class="chev">›</span></summary>
+      <div class="settings-body">
+        <div class="settings-group">
+          <h3>Taxes &amp; cotisations</h3>
+          <div class="row"><label>TVA</label><input type="number" id="cfgTva" step="0.1"> %</div>
+          <div class="row"><label>Participation</label><input type="number" id="cfgParticipation" step="0.1"> %</div>
+          <div class="row"><label>URSSAF</label><input type="number" id="cfgUrssaf" step="0.01"> %</div>
+        </div>
+        <div class="settings-group">
+          <h3>Objectifs &amp; plafond</h3>
+          <div class="row"><label>Objectif net annuel</label><input type="number" id="cfgObjectif" step="500"> €</div>
+          <div class="row"><label>Objectif net mensuel</label><input type="number" id="cfgObjectifMensuel" step="50"> €</div>
+          <div class="row"><label>Plafond auto-entrepreneur HT</label><input type="number" id="cfgPlafond" step="100"> €</div>
+        </div>
+        <div class="settings-group">
+          <h3>Barème du taux automatique (TTC mensuel)</h3>
+          <div class="tier-row" style="color:var(--ink-3); font-weight:600;"><span>Seuil bas</span><span>Seuil haut</span><span>Taux</span></div>
+          <div id="tierRows"></div>
+        </div>
+        <div class="settings-foot">
+          <span class="hint" id="settingsSaved" style="align-self:center;"></span>
+          <button class="btn btn-primary btn-sm" id="btnSaveSettings">Enregistrer les paramètres</button>
+        </div>
+      </div>
+    </details>
+
+    <footer class="note">Les données sont synchronisées automatiquement sur tous tes appareils connectés à ce lien.</footer>
+  </main>
+</div>
+
+<div class="scrim" id="scrim"></div>
+<div class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="drawerTitle">
+  <div class="drawer-head">
+    <h2 id="drawerTitle">Nouveau dossier</h2>
+    <button class="btn btn-ghost btn-sm" id="btnCloseDrawer" aria-label="Fermer">✕</button>
+  </div>
+  <div class="drawer-body">
+    <div class="form-grid">
+      <div class="form-field full">
+        <label for="fNom">Nom du dossier</label>
+        <input type="text" id="fNom" placeholder="ex. DUPONT / MARTIN">
+      </div>
+      <div class="form-field full">
+        <label>Type de dossier</label>
+        <div class="radio-group" id="typeGroup">
+          <label><input type="radio" name="type" value="NORMAL" checked><span>Normal</span></label>
+          <label><input type="radio" name="type" value="PRIME"><span>Prime</span></label>
+          <label><input type="radio" name="type" value="APPORTEUR"><span>Apporteur</span></label>
+        </div>
+      </div>
+      <div class="form-field full" id="partenaireField" style="display:none;">
+        <label for="fPartenaire">Partenaire / apporteur d'affaire</label>
+        <input type="text" id="fPartenaire" placeholder="ex. VousFinancer">
+      </div>
+      <div class="form-field">
+        <label for="fStatut">Statut</label>
+        <select id="fStatut">
+          <option value="En attente">En attente</option>
+          <option value="Payé">Payé</option>
+          <option value="Abandon">Abandon</option>
+        </select>
+      </div>
+      <div class="form-field">
+        <label for="fHonoraires">Honoraires TTC (€)</label>
+        <input type="number" id="fHonoraires" step="1" min="0">
+      </div>
+      <div class="form-field">
+        <label for="fDateNotaire">Date notaire</label>
+        <input type="date" id="fDateNotaire">
+      </div>
+      <div class="form-field">
+        <label for="fDateEncaissement" style="display:flex; align-items:center; justify-content:space-between; gap:6px;">
+          <span>Date encaissement</span>
+          <span style="display:flex; align-items:center; gap:5px; text-transform:none; letter-spacing:0; font-weight:500; font-size:11.5px; color:var(--ink-2); cursor:pointer;">
+            <input type="checkbox" id="fEncaissementDiff" style="width:auto; margin:0;"> différente
+          </span>
+        </label>
+        <input type="date" id="fDateEncaissement" disabled>
+      </div>
+      <div class="form-field full" id="tauxField">
+        <label for="fTaux">Taux appliqué</label>
+        <select id="fTaux">
+          <option value="AUTO">Automatique (barème)</option>
+          <option value="0.53">53 %</option>
+          <option value="0.55">55 %</option>
+          <option value="0.6">60 %</option>
+          <option value="1">100 %</option>
+          <option value="custom">Personnalisé…</option>
+        </select>
+      </div>
+      <div class="form-field full" id="tauxCustomField" style="display:none;">
+        <label for="fTauxCustom">Taux personnalisé (%)</label>
+        <input type="number" id="fTauxCustom" step="1" min="0" max="100">
+      </div>
+    </div>
+
+    <div class="preview" id="preview"></div>
+  </div>
+  <div class="drawer-foot">
+    <button class="btn btn-danger" id="btnDelete" style="display:none;">Supprimer</button>
+    <div style="display:flex; gap:8px; margin-left:auto;">
+      <button class="btn" id="btnCancel">Annuler</button>
+      <button class="btn btn-primary" id="btnSave">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-stack" id="toastStack"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+<script>
+(function(){
+  "use strict";
+
+  /* ---------------- config & seed data ---------------- */
+  var DEFAULT_SETTINGS = {
+    tva: 0.20,
+    participation: 0.03,
+    urssaf: 0.27940000000000004, // taux réel de prélèvement URSSAF tout confondu (cotisations + CFP + CCI/CMA + versement libératoire) vérifié sur la déclaration d'août 2026
+    objectifAnnuel: 42000,
+    plafond: 83600,
+    seuils: [
+      { bas: 0, haut: 16999, taux: 0.53 },
+      { bas: 17000, haut: 24999, taux: 0.55 },
+      { bas: 25000, haut: 99999999, taux: 0.60 }
+    ]
+  };
+
+  // Données réelles au 26/09/2026, reprises telles quelles depuis la base précédente
+  // (ids et dates de création conservés pour ne rien perdre lors de la migration Firebase)
+  var SEED_DOSSIERS = [
+    { id:"dmtljsev3k9o0a1", nom:"SAUVÉ / THAN", statut:"Payé", type:"NORMAL", honoraires:5000, dateNotaire:"2026-02-13", dateEncaissement:"2026-02-13", taux:0.6 },
+    { id:"dmtljsev4abnp7h", nom:"BOFFA / MECHETY BLEUSE", statut:"Payé", type:"NORMAL", honoraires:12716, dateNotaire:"2026-02-03", dateEncaissement:"2026-02-03", taux:0.6 },
+    { id:"dmtljsev4ws9ypf", nom:"PEPORI / LE TRAOU (Loc)", statut:"Payé", type:"NORMAL", honoraires:991.84, dateNotaire:"2026-03-07", dateEncaissement:"2026-03-07", taux:"AUTO" },
+    { id:"dmtljsev519o4bs", nom:"DOS SANTOS / BOUCETTA (Loc)", statut:"Payé", type:"NORMAL", honoraires:816.08, dateNotaire:"2026-03-11", dateEncaissement:"2026-03-11", taux:"AUTO" },
+    { id:"dmtljsev5407wva", nom:"RUCH & PILLOT / LOPES", statut:"Payé", type:"NORMAL", honoraires:5000, dateNotaire:"2026-06-30", dateEncaissement:"2026-06-30", taux:0.55 },
+    { id:"dmtljsev5kvwdam", nom:"RIBAUD / FEUVRIER", statut:"Payé", type:"NORMAL", honoraires:14000, dateNotaire:"2026-04-29", dateEncaissement:"2026-05-27", taux:"AUTO" },
+    { id:"dmtljsev5lbgam4", nom:"LEBERT / RASTEGAR & DESBROSSE", statut:"En attente", type:"NORMAL", partenaire:"", honoraires:5000, dateNotaire:"2026-12-12", dateEncaissement:"2026-12-12", taux:"AUTO" },
+    { id:"dmtljsev5qpxyhq", nom:"MASSARI / GUÉHO", statut:"Payé", type:"NORMAL", honoraires:10000, dateNotaire:"2026-06-26", dateEncaissement:"2026-06-26", taux:0.55 },
+    { id:"dmtljsev5un10v2", nom:"Pizzeria Jérôme", statut:"Payé", type:"NORMAL", honoraires:2500, dateNotaire:"2026-04-09", dateEncaissement:"2026-03-30", taux:"AUTO" },
+    { id:"dmtljsev697ldmr", nom:"BENOIT / CHARRE", statut:"Payé", type:"NORMAL", honoraires:13900, dateNotaire:"2026-08-28", dateEncaissement:"2026-08-28", taux:0.6 },
+    { id:"dmtljsev6i812hl", nom:"DELATTRE / OUARET", statut:"Payé", type:"NORMAL", honoraires:5000, dateNotaire:"2026-08-27", dateEncaissement:"2026-08-27", taux:0.6 },
+    { id:"dmtljsev6ia0p03", nom:"JOFFARD / ZERZOUR", statut:"Payé", type:"NORMAL", honoraires:5000, dateNotaire:"2026-08-14", dateEncaissement:"2026-08-14", taux:0.6 },
+    { id:"dmtljsev6kl8i2m", nom:"CHARRE", statut:"En attente", type:"APPORTEUR", partenaire:"VousFinancer", honoraires:350, dateNotaire:"2026-08-28", dateEncaissement:"2026-08-28", taux:1 },
+    { id:"dmtljsev6q39vi1", nom:"D'ALMEIDA / DAMREE", statut:"En attente", type:"NORMAL", partenaire:"", honoraires:7500, dateNotaire:"2026-09-24", dateEncaissement:"2026-09-24", taux:"AUTO", createdAt:"2026-09-03T13:15:25.890Z" },
+    { id:"dmtljsev6wflbkj", nom:"CASTELAO / BALDE (Loc)", statut:"Payé", type:"NORMAL", honoraires:902.04, dateNotaire:"2026-07-02", dateEncaissement:"2026-07-02", taux:"AUTO" },
+    { id:"dmtljsev7129u92", nom:"COLOMBEL / SECRESTAT & STATE", statut:"Payé", type:"NORMAL", honoraires:1268.30, dateNotaire:"2026-07-24", dateEncaissement:"2026-07-24", taux:0.6 },
+    { id:"dmtljsev7bbevhl", nom:"CHARRE / LEVEILLE & PIN", statut:"En attente", type:"NORMAL", honoraires:7100, dateNotaire:"2026-10-27", dateEncaissement:"2026-10-27", taux:"AUTO" },
+    { id:"dmtljsev7ektcl5", nom:"MOUGEOT / SOLLENNI", statut:"En attente", type:"NORMAL", partenaire:"", honoraires:5000, dateNotaire:"2026-10-02", dateEncaissement:"2026-10-02", taux:"AUTO", createdAt:"2026-09-03T13:15:25.891Z" },
+    { id:"dmtljsev7ho3l8m", nom:"PICHARD / AURIAC", statut:"En attente", type:"NORMAL", honoraires:14950, dateNotaire:"2026-11-30", dateEncaissement:"2026-11-30", taux:"AUTO" },
+    { id:"dmtljsev7wm4rf0", nom:"DAVID ROY (SCI) / STIOT (Loc)", statut:"Payé", type:"NORMAL", honoraires:949.97, dateNotaire:"2026-07-04", dateEncaissement:"2026-07-04", taux:"AUTO" },
+    { id:"dmtoi1i5qhbsdjx", nom:"GOUPILLERE / MAINCENT (Loc)", statut:"En attente", type:"NORMAL", partenaire:"", honoraires:806.4, dateNotaire:"2026-10-05", dateEncaissement:"2026-10-05", taux:"AUTO", createdAt:"2026-09-05T14:49:49.358Z" },
+    { id:"dmtx79y87aou9vg", nom:"CHATILLON / EUZENAT AZE", statut:"Payé", type:"NORMAL", partenaire:"", honoraires:7500, dateNotaire:"2026-01-20", dateEncaissement:"2026-01-20", taux:"AUTO", createdAt:"2026-09-11T16:58:23.239Z" },
+    { id:"dmu2c4d7q6vflg4", nom:"QUES", statut:"En attente", type:"APPORTEUR", partenaire:"VousFinancer", honoraires:350, dateNotaire:"2026-11-30", dateEncaissement:"2026-11-30", taux:1, createdAt:"2026-09-15T07:12:51.687Z" }
+  ];
+
+  var MOIS_FR = ["Jan","Fév","Mar","Avr","Mai","Juin","Juil","Août","Sep","Oct","Nov","Déc"];
+  var MOIS_FR_LONG = ["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"];
+  var euro = new Intl.NumberFormat('fr-FR', { style:'currency', currency:'EUR', maximumFractionDigits:0 });
+  var euro2 = new Intl.NumberFormat('fr-FR', { style:'currency', currency:'EUR', maximumFractionDigits:2 });
+  // affiche les centimes uniquement quand le montant n'est pas un nombre rond
+  // (5 000 € mais 806,40 €), pour rester lisible sans perdre en précision
+  function euroSmart(n){
+    n = n || 0;
+    var hasCents = Math.round(n*100) % 100 !== 0;
+    return hasCents ? euro2.format(n) : euro.format(n);
+  }
+
+  function uid(){ return 'd' + Date.now().toString(36) + Math.random().toString(36).slice(2,8); }
+  function parseThousands(str){ return Number(String(str||'').replace(/[^\d]/g,'')) || 0; }
+  function formatThousands(n){ return Math.round(n).toLocaleString('fr-FR').replace(/[  ]/g,' '); }
+  function monthKey(iso){ return iso ? iso.slice(0,7) : null; }
+  function clamp(n,a,b){ return Math.max(a, Math.min(b,n)); }
+
+  /* ---------------- state ---------------- */
+  var state = {
+    settings: JSON.parse(JSON.stringify(DEFAULT_SETTINGS)),
+    dossiers: [],
+    year: 2026,
+    tab: 'attente',
+    search: '',
+    editingId: null,
+    db: null,
+    dbReady: false,
+    includeAttente: true,
+    sortKey: 'createdAt_desc'
+  };
+
+  /* ---------------- calculation engine ---------------- */
+  function tierRateFor(ttcMonthTotal, seuils){
+    for (var i=0;i<seuils.length;i++){
+      if (ttcMonthTotal >= seuils[i].bas && ttcMonthTotal <= seuils[i].haut) return seuils[i].taux;
+    }
+    return seuils[seuils.length-1].taux;
+  }
+
+  // Cumul TTC par mois notaire, uniquement sur les dossiers NORMAL inclus (hors Abandon)
+  function monthlyAutoRates(dossiers, settings){
+    var totals = {};
+    dossiers.forEach(function(d){
+      if (d.type !== 'NORMAL' || d.statut === 'Abandon' || !d.dateNotaire) return;
+      var k = monthKey(d.dateNotaire);
+      totals[k] = (totals[k]||0) + Number(d.honoraires||0);
+    });
+    var rates = {};
+    Object.keys(totals).forEach(function(k){ rates[k] = tierRateFor(totals[k], settings.seuils); });
+    return { totals: totals, rates: rates };
+  }
+
+  function computeDossier(d, autoRates, settings){
+    var ttc = Number(d.honoraires) || 0;
+    var caHT = ttc / (1 + settings.tva);
+    var taux;
+    if (d.type === 'NORMAL'){
+      taux = (d.taux === 'AUTO' || d.taux === null || d.taux === undefined)
+        ? (autoRates.rates[monthKey(d.dateNotaire)] || settings.seuils[0].taux)
+        : Number(d.taux);
+    } else {
+      // PRIME / APPORTEUR : taux libre, pas de palier automatique
+      taux = (d.taux === 'AUTO' || d.taux === null || d.taux === undefined) ? 1 : Number(d.taux);
+    }
+    var commissionBrute = caHT * taux;
+    var participationEUR = (d.type === 'NORMAL') ? commissionBrute * settings.participation : 0;
+    var commissionNette = commissionBrute - participationEUR;
+    // TVA et URSSAF calculées au centime près (l'arrondi à l'euro n'existe que sur la déclaration URSSAF
+    // globale mensuelle, pas dossier par dossier — l'appliquer par dossier fausserait le montant réel perçu,
+    // surtout sur les petits dossiers).
+    var tvaCommission = commissionNette * settings.tva;
+    var totalFactureTTC = commissionNette + tvaCommission;
+    var urssafMontant = commissionNette * settings.urssaf;
+    var netAPercevoir = commissionNette - urssafMontant;
+    return {
+      caHT: caHT, taux: taux, commissionBrute: commissionBrute, participationEUR: participationEUR,
+      commissionNette: commissionNette, tvaCommission: tvaCommission, totalFactureTTC: totalFactureTTC,
+      urssafMontant: urssafMontant, netAPercevoir: netAPercevoir
+    };
+  }
+
+  function yearDossiers(){
+    return state.dossiers.filter(function(d){
+      return d.dateNotaire && Number(d.dateNotaire.slice(0,4)) === state.year;
+    });
+  }
+
+  function includedDossiers(list){
+    return list.filter(function(d){ return d.statut !== 'Abandon'; });
+  }
+
+  /* ---------------- rendering ---------------- */
+  function render(){
+    var all = yearDossiers();
+    var autoRates = monthlyAutoRates(all, state.settings);
+    var included = includedDossiers(all);
+    var computed = included.map(function(d){ return { d:d, c: computeDossier(d, autoRates, state.settings) }; });
+
+    renderStatusRow(all);
+    renderKPIs(computed, all);
+    renderChart(all, autoRates);
+    renderGauges(computed);
+    renderTable(all, autoRates);
+    renderApporteurs(computed);
+    populateYearSelect();
+  }
+
+  function renderApporteurs(computed){
+    var apporteurs = computed.filter(function(x){ return x.d.type==='APPORTEUR'; });
+    var card = document.getElementById('apporteursCard');
+    if (!apporteurs.length){ card.hidden = true; return; }
+    card.hidden = false;
+
+    var byPartner = {};
+    apporteurs.forEach(function(x){
+      var key = (x.d.partenaire || 'Sans nom').trim() || 'Sans nom';
+      if (!byPartner[key]) byPartner[key] = { count:0, ttc:0, net:0 };
+      byPartner[key].count += 1;
+      byPartner[key].ttc += Number(x.d.honoraires)||0;
+      byPartner[key].net += x.c.netAPercevoir;
+    });
+
+    var names = Object.keys(byPartner).sort(function(a,b){ return byPartner[b].net - byPartner[a].net; });
+    document.getElementById('apporteursBody').innerHTML = names.map(function(name){
+      var p = byPartner[name];
+      return '<tr><td>'+escapeHTML(name)+'</td><td class="num">'+p.count+'</td>'+
+        '<td class="num">'+euroSmart(p.ttc)+'</td><td class="num">'+euro2.format(p.net)+'</td></tr>';
+    }).join('');
+
+    var totalCount = apporteurs.length;
+    var totalTtc = sum(apporteurs, function(x){ return Number(x.d.honoraires)||0; });
+    var totalNet = sum(apporteurs, function(x){ return x.c.netAPercevoir; });
+    document.getElementById('apporteursFoot').innerHTML =
+      '<tr><td>Total</td><td class="num">'+totalCount+'</td>'+
+      '<td class="num">'+euroSmart(totalTtc)+'</td><td class="num">'+euro2.format(totalNet)+'</td></tr>';
+  }
+
+  function renderStatusRow(all){
+    var paye = all.filter(function(d){ return d.statut==='Payé'; }).length;
+    var attente = all.filter(function(d){ return d.statut==='En attente'; }).length;
+    var annule = all.filter(function(d){ return d.statut==='Abandon'; }).length;
+    document.getElementById('statusRow').innerHTML =
+      tile('paye','Dossiers payés',paye) + tile('attente','Dossiers en attente',attente) + tile('annule','Dossiers annulés',annule);
+    function tile(cls,label,count){
+      return '<div class="status-tile '+cls+'"><span class="dot"></span><div><div class="count num">'+count+'</div><div class="label">'+label+'</div></div></div>';
+    }
+  }
+
+  function sum(arr, fn){ return arr.reduce(function(a,x){ return a + fn(x); }, 0); }
+
+  function renderKPIs(computed, all){
+    var caTTC = sum(computed, function(x){ return Number(x.d.honoraires)||0; });
+    var commissionFactureeTTC = sum(computed, function(x){ return x.c.totalFactureTTC; });
+    var commissionNette = sum(computed, function(x){ return x.c.commissionNette; });
+    var urssaf = sum(computed, function(x){ return x.c.urssafMontant; });
+    var tva = sum(computed, function(x){ return x.c.tvaCommission; });
+    var netTotal = sum(computed, function(x){ return x.c.netAPercevoir; });
+    var enAttente = computed.filter(function(x){ return x.d.statut==='En attente'; });
+    var resteAFacturer = sum(enAttente, function(x){ return x.c.totalFactureTTC; });
+    var netAttente = sum(enAttente, function(x){ return x.c.netAPercevoir; });
+
+    var tiles = [
+      { label:"Chiffre d'affaires TTC", value: euro.format(caTTC) },
+      { label:"Commission facturée TTC", value: euro.format(commissionFactureeTTC) },
+      { label:"Commission nette HT", value: euro.format(commissionNette) },
+      { label:"URSSAF à payer", value: euro.format(urssaf), tone:'warn' },
+      { label:"TVA collectée", value: euro.format(tva) },
+      { label:"Nombre de transactions", value: computed.length },
+      { label:"Reste à facturer (TTC)", value: euro.format(resteAFacturer) },
+      { label:"Net à percevoir (en attente)", value: euro.format(netAttente), tone:'pos' }
+    ];
+    document.getElementById('kpiGrid').innerHTML = tiles.map(function(t){
+      return '<div class="kpi-tile"><div class="label">'+t.label+'</div><div class="value num'+(t.tone?' '+ (t.tone==='pos'?'accent':'') :'')+'" style="'+(t.tone==='warn'?'color:var(--warn)':(t.tone==='pos'?'color:var(--pos)':''))+'">'+t.value+'</div></div>';
+    }).join('');
+
+    // net réel encaissé (après TVA & URSSAF) — bascule pour inclure ou non les dossiers en attente
+    var netReelScope = state.includeAttente ? computed : computed.filter(function(x){ return x.d.statut==='Payé'; });
+    var netReelAnnuel = sum(netReelScope, function(x){ return x.c.netAPercevoir; });
+    document.getElementById('netReelAnnuel').textContent = euro2.format(netReelAnnuel);
+    document.getElementById('netReelMensuel').textContent = 'soit ' + euro2.format(netReelAnnuel/12) + ' / mois en moyenne sur l\'année';
+
+    // objectif
+    var settings = state.settings;
+    var pct = clamp(netTotal / settings.objectifAnnuel, 0, 1.4);
+    document.getElementById('objTarget').textContent = euro.format(settings.objectifAnnuel);
+    document.getElementById('objTargetMensuel').textContent = 'soit ' + euro.format(settings.objectifAnnuel/12) + ' / mois';
+    document.getElementById('objFill').style.width = (Math.min(pct,1)*100)+'%';
+    document.getElementById('objNow').textContent = euro2.format(netTotal) + ' net à date';
+    var diff = netTotal - settings.objectifAnnuel;
+    var mensuel = netTotal/12;
+    if (diff >= 0){
+      document.getElementById('objStatus').innerHTML = '<span style="color:var(--pos); font-weight:600;">dépassé de +'+euro.format(diff)+'</span>';
+    } else {
+      document.getElementById('objStatus').innerHTML = 'reste '+euro.format(-diff);
+    }
+
+    // simulateur nb de ventes
+    var coeff = (1/(1+settings.tva)) * settings.seuils[0].taux * (1-settings.participation) * (1-settings.urssaf);
+    var simInput = parseThousands(document.getElementById('simHonoraires').value) || 5000;
+    var netParVente = simInput * coeff;
+    var simResultEl = document.getElementById('simResult');
+    var ratio = Math.abs(diff) / netParVente;
+    var ratioTxt = ratio.toLocaleString('fr-FR', { minimumFractionDigits:1, maximumFractionDigits:1 });
+    if (diff >= 0){
+      simResultEl.textContent = 'équivalent de ' + ratioTxt + ' vente(s) d\'avance';
+    } else {
+      simResultEl.textContent = ratioTxt + ' vente(s) restante(s) pour l\'atteindre';
+    }
+
+    // plafond
+    var plafondPct = clamp(commissionNette / settings.plafond, 0, 1.4);
+    document.getElementById('plafondPct').textContent = (plafondPct*100).toFixed(1)+' %';
+    document.getElementById('plafondFill').style.width = (Math.min(plafondPct,1)*100)+'%';
+    document.getElementById('plafondFill').className = 'bar-fill' + (plafondPct >= 0.9 ? '' : ' pos');
+    var plafondResteHT = Math.max(settings.plafond-commissionNette,0);
+    document.getElementById('plafondUsedTTC').textContent = euro.format(commissionNette*(1+settings.tva)) + ' réalisé TTC';
+    document.getElementById('plafondUsedHT').textContent = euro.format(commissionNette) + ' HT';
+    document.getElementById('plafondLeftTTC').textContent = euro.format(plafondResteHT*(1+settings.tva)) + ' restant TTC';
+    document.getElementById('plafondLeftHT').textContent = euro.format(plafondResteHT) + ' HT';
+  }
+
+  function renderGauges(computed){ /* handled inside renderKPIs for shared totals */ }
+
+  function renderChart(all, autoRates){
+    var svg = document.getElementById('chartSvg');
+    var tooltip = document.getElementById('chartTooltip');
+    var settings = state.settings;
+    var W = 640, H = 260, padL = 40, padR = 10, padT = 14, padB = 26;
+
+    var prevYear = state.year - 1;
+    var prevAll = state.dossiers.filter(function(d){ return d.dateNotaire && Number(d.dateNotaire.slice(0,4))===prevYear; });
+    var hasPrevYear = prevAll.length > 0;
+
+    var months = [];
+    for (var m=0;m<12;m++){
+      var key = state.year + '-' + String(m+1).padStart(2,'0');
+      var prevKey = prevYear + '-' + String(m+1).padStart(2,'0');
+      var monthDossiers = includedDossiers(all).filter(function(d){ return monthKey(d.dateNotaire)===key; });
+      var prevMonthDossiers = includedDossiers(prevAll).filter(function(d){ return monthKey(d.dateNotaire)===prevKey; });
+      var ttc = sum(monthDossiers, function(d){ return Number(d.honoraires)||0; });
+      var commission = sum(monthDossiers, function(d){ return computeDossier(d, autoRates, settings).commissionNette; });
+      var net = sum(monthDossiers, function(d){ return computeDossier(d, autoRates, settings).netAPercevoir; });
+      var prevTtc = sum(prevMonthDossiers, function(d){ return Number(d.honoraires)||0; });
+      months.push({ key:key, label: MOIS_FR[m], ttc: ttc, commission: commission, net: net, prevTtc: prevTtc });
+    }
+
+    // rythme objectif : c'est un montant NET mensuel (objectif net annuel / 12).
+    // Il ne peut pas être comparé tel quel aux barres (TTC / commission nette HT) :
+    // il faut le convertir en commission nette HT équivalente (avant URSSAF) pour
+    // qu'il se place au bon niveau sur l'axe des barres vertes.
+    var rythmeNet = settings.objectifAnnuel/12;
+    var rythme = rythmeNet / (1 - settings.urssaf);
+    // paliers : chaque frontière (17k, 25k) affiche le taux du PALIER SUIVANT (celui qu'on atteint en la dépassant)
+    var seuils = [];
+    for (var si=0; si<settings.seuils.length-1; si++){
+      seuils.push({ boundary: settings.seuils[si].haut, nextTaux: settings.seuils[si+1].taux });
+    }
+    var maxVal = Math.max.apply(null, months.map(function(x){ return Math.max(x.ttc, hasPrevYear?x.prevTtc:0); }).concat([1000]));
+    var niceMax = Math.ceil(maxVal/2000)*2000 || 2000;
+    var plotW = W - padL - padR, plotH = H - padT - padB;
+    var groupW = plotW / 12;
+    var barW = Math.min(14, groupW*0.28);
+
+    function y(v){ return padT + plotH - (v/niceMax)*plotH; }
+
+    // légende (dynamique : n'affiche l'année précédente que si des données existent)
+    var legendHTML =
+      '<span><i style="background:var(--chart-2)"></i>Honoraires TTC</span>' +
+      '<span><i style="background:var(--chart-1)"></i>Commission nette HT</span>';
+    if (hasPrevYear){
+      legendHTML += '<span><i style="background:none;border-top:2px dashed var(--ink-3);height:0;width:11px;"></i>TTC '+prevYear+'</span>';
+    }
+    if (rythme <= niceMax){
+      legendHTML += '<span><i style="background:none;border-top:2px dotted var(--neg);height:0;width:11px;"></i>Rythme objectif ('+euro.format(Math.round(rythmeNet))+' net/mois)</span>';
+    }
+    document.getElementById('chartLegend').innerHTML = legendHTML;
+
+    var gridLines = '';
+    var steps = 4;
+    for (var s=0;s<=steps;s++){
+      var v = niceMax*s/steps;
+      var yy = y(v);
+      gridLines += '<line class="axis-line" x1="'+padL+'" x2="'+(W-padR)+'" y1="'+yy+'" y2="'+yy+'"></line>';
+      gridLines += '<text x="'+(padL-6)+'" y="'+(yy+3)+'" text-anchor="end">'+Math.round(v/1000)+'k</text>';
+    }
+
+    // lignes de palier (barème du taux automatique)
+    var refLines = '';
+    seuils.forEach(function(s){
+      if (s.boundary > niceMax) return;
+      var yy = y(s.boundary);
+      refLines += '<line x1="'+padL+'" x2="'+(W-padR)+'" y1="'+yy+'" y2="'+yy+'" stroke="var(--ink-3)" stroke-width="1" stroke-dasharray="3 3" opacity="0.55"></line>';
+      refLines += '<text x="'+(W-padR)+'" y="'+(yy-3)+'" text-anchor="end" fill="var(--ink-3)" font-size="9.5">'+Math.round(s.boundary/1000)+'k → passage '+Math.round(s.nextTaux*100)+'%</text>';
+    });
+    // ligne de rythme objectif (sur l'échelle commission, même axe) — le libellé
+    // vit dans la légende au-dessus du graphique (voir plus haut), pas ici, pour
+    // ne jamais chevaucher les barres ni les chiffres de l'axe
+    if (rythme <= niceMax){
+      var ry = y(rythme);
+      refLines += '<line x1="'+padL+'" x2="'+(W-padR)+'" y1="'+ry+'" y2="'+ry+'" stroke="var(--neg)" stroke-width="1.4" stroke-dasharray="1 3" stroke-linecap="round" opacity="0.85"></line>';
+    }
+
+    // comparaison année précédente (TTC, ligne pointillée)
+    var prevLine = '';
+    if (hasPrevYear){
+      var pts = months.map(function(mo,i){
+        var cx = padL + groupW*i + groupW/2;
+        return (cx-barW/2-1)+','+y(mo.prevTtc);
+      }).join(' ');
+      prevLine = '<polyline points="'+pts+'" fill="none" stroke="var(--ink-3)" stroke-width="1.6" stroke-dasharray="4 3" opacity="0.7"></polyline>';
+    }
+
+    var bars = '';
+    months.forEach(function(mo, i){
+      var cx = padL + groupW*i + groupW/2;
+      var x1 = cx - barW - 2, x2 = cx + 2;
+      var y1v = y(mo.ttc), y2v = y(mo.commission);
+      bars += '<rect class="bar" data-i="'+i+'" data-s="ttc" x="'+x1+'" y="'+y1v+'" width="'+barW+'" height="'+(padT+plotH-y1v)+'" rx="2" fill="var(--chart-2)"></rect>';
+      bars += '<rect class="bar" data-i="'+i+'" data-s="com" x="'+x2+'" y="'+y2v+'" width="'+barW+'" height="'+(padT+plotH-y2v)+'" rx="2" fill="var(--chart-1)"></rect>';
+      bars += '<text x="'+cx+'" y="'+(H-8)+'" text-anchor="middle">'+mo.label+'</text>';
+    });
+
+    svg.innerHTML = gridLines + refLines + prevLine + bars;
+
+    svg.querySelectorAll('.bar').forEach(function(rect){
+      rect.addEventListener('mouseenter', function(e){ showTip(e, rect); });
+      rect.addEventListener('mousemove', function(e){ showTip(e, rect); });
+      rect.addEventListener('mouseleave', function(){ tooltip.classList.remove('show'); });
+    });
+    function showTip(e, rect){
+      var i = Number(rect.getAttribute('data-i'));
+      var mo = months[i];
+      var wrapBox = svg.parentElement.getBoundingClientRect();
+      var px = e.clientX - wrapBox.left;
+      var py = e.clientY - wrapBox.top;
+      tooltip.style.left = px+'px';
+      tooltip.style.top = py+'px';
+      var html = '<b>'+MOIS_FR_LONG[i]+' '+state.year+'</b><br>TTC : <b>'+euro.format(mo.ttc)+'</b><br>Commission nette HT : <b>'+euro.format(mo.commission)+'</b><br>Net réel (après URSSAF) : <b>'+euro.format(mo.net)+'</b>';
+      if (hasPrevYear) html += '<br>TTC '+prevYear+' : <b>'+euro.format(mo.prevTtc)+'</b>';
+      tooltip.innerHTML = html;
+      tooltip.classList.add('show');
+    }
+  }
+
+  function statusPillHTML(statut){
+    var cls = statut==='Payé' ? 'paye' : (statut==='En attente' ? 'attente' : 'annule');
+    return '<span class="pill '+cls+'">'+statut+'</span>';
+  }
+
+  // date d'ajout réelle d'un dossier : chaque id généré par uid() commence par
+  // 'd' suivi de Date.now() encodé en base36 (8 caractères) — même les dossiers
+  // créés avant l'ajout du champ createdAt portent donc leur vraie date de
+  // création dans leur id, qu'on peut décoder sans rien avoir à migrer.
+  function creationTimeFromId(id){
+    if (!id || id.charAt(0) !== 'd' || id.length < 9) return null;
+    var ts = parseInt(id.slice(1,9), 36);
+    if (!ts || isNaN(ts)) return null;
+    return new Date(ts).toISOString();
+  }
+  function dossierCreatedAt(d){
+    return d.createdAt || creationTimeFromId(d.id) || d.dateNotaire || '';
+  }
+
+  function sortComparator(sortKey){
+    var parts = sortKey.split('_');
+    var field = parts[0], dir = parts[1] === 'asc' ? 1 : -1;
+    return function(a,b){
+      var va, vb;
+      if (field === 'createdAt'){ va = dossierCreatedAt(a); vb = dossierCreatedAt(b); }
+      else if (field === 'nom'){ va = (a.nom||'').toLowerCase(); vb = (b.nom||'').toLowerCase(); }
+      else if (field === 'honoraires'){ va = Number(a.honoraires)||0; vb = Number(b.honoraires)||0; }
+      else { va = a[field]||''; vb = b[field]||''; } // dateNotaire
+      if (va < vb) return -1*dir;
+      if (va > vb) return 1*dir;
+      return 0;
+    };
+  }
+
+  function renderTable(all, autoRates){
+    var tab = state.tab;
+    var list = all.filter(function(d){
+      if (tab==='attente') return d.statut==='En attente';
+      if (tab==='paye') return d.statut==='Payé';
+      return true;
+    });
+    if (state.search.trim()){
+      var q = state.search.trim().toLowerCase();
+      list = list.filter(function(d){ return d.nom.toLowerCase().indexOf(q) > -1; });
+    }
+    list.sort(sortComparator(state.sortKey));
+
+    var body = document.getElementById('tableBody');
+    if (!list.length){
+      body.innerHTML = '<tr class="empty-row"><td colspan="7">Aucun dossier dans cette vue.</td></tr>';
+      return;
+    }
+    body.innerHTML = list.map(function(d){
+      var c = computeDossier(d, autoRates, state.settings);
+      var moisLabel = d.dateNotaire ? MOIS_FR_LONG[Number(d.dateNotaire.slice(5,7))-1] + ' ' + d.dateNotaire.slice(0,4) : '—';
+      var typeTag = d.type !== 'NORMAL' ? '<span class="type-tag">'+(d.type==='APPORTEUR' ? (d.partenaire||'Apporteur') : 'Prime')+'</span>' : '';
+      var action = d.statut==='En attente'
+        ? '<button class="btn btn-sm mark-paid" data-id="'+d.id+'" title="Marquer comme payé">✓ Payé</button>'
+        : '';
+      return '<tr data-id="'+d.id+'">'+
+        '<td>'+escapeHTML(d.nom)+typeTag+'</td>'+
+        '<td>'+statusPillHTML(d.statut)+'</td>'+
+        '<td>'+moisLabel+'</td>'+
+        '<td class="num">'+euroSmart(Number(d.honoraires)||0)+'</td>'+
+        '<td class="num">'+Math.round(c.taux*100)+' %</td>'+
+        '<td class="num">'+euro2.format(c.netAPercevoir)+'</td>'+
+        '<td class="num" onclick="event.stopPropagation()">'+action+'</td>'+
+        '</tr>';
+    }).join('');
+
+    body.querySelectorAll('tr[data-id]').forEach(function(tr){
+      tr.addEventListener('click', function(){
+        var d = state.dossiers.find(function(x){ return x.id===tr.getAttribute('data-id'); });
+        if (d) openDrawer(d);
+      });
+    });
+    body.querySelectorAll('.mark-paid').forEach(function(btn){
+      btn.addEventListener('click', function(e){
+        e.stopPropagation();
+        openPaidPopover(btn.getAttribute('data-id'), btn);
+      });
+    });
+  }
+
+  /* ---------------- marquer payé (popover date) ---------------- */
+  function openPaidPopover(dossierId, anchorEl){
+    closePaidPopover();
+    var d = state.dossiers.find(function(x){ return x.id===dossierId; });
+    if (!d) return;
+    var today = new Date().toISOString().slice(0,10);
+    var pop = document.createElement('div');
+    pop.className = 'paid-popover';
+    pop.innerHTML =
+      '<div class="paid-popover-title">Payé le</div>' +
+      '<input type="date" id="paidDateInput" value="'+today+'">' +
+      '<div class="paid-popover-actions">' +
+        '<button class="btn btn-sm" id="paidCancel">Annuler</button>' +
+        '<button class="btn btn-sm btn-primary" id="paidConfirm">Confirmer</button>' +
+      '</div>';
+    document.body.appendChild(pop);
+    var r = anchorEl.getBoundingClientRect();
+    var popW = 220;
+    var left = Math.min(r.left, window.innerWidth - popW - 12);
+    pop.style.left = Math.max(12,left) + 'px';
+    pop.style.top = (r.bottom + window.scrollY + 6) + 'px';
+
+    document.getElementById('paidConfirm').addEventListener('click', function(){
+      var dateVal = document.getElementById('paidDateInput').value || today;
+      d.statut = 'Payé';
+      d.dateEncaissement = dateVal;
+      // l'UI se met à jour d'abord, la synchro réseau ensuite : si la synchro
+      // échoue ou lève une erreur, le popover se ferme et le tableau se
+      // rafraîchit quand même (persistDossier a son propre filet de sécurité)
+      closePaidPopover();
+      render();
+      toast('Dossier marqué payé le ' + dateVal.split('-').reverse().join('/') + '.');
+      persistDossier(d);
+    });
+    document.getElementById('paidCancel').addEventListener('click', closePaidPopover);
+    setTimeout(function(){ document.addEventListener('mousedown', onOutsideClick); }, 0);
+  }
+  function onOutsideClick(e){
+    var pop = document.querySelector('.paid-popover');
+    if (pop && !pop.contains(e.target)) closePaidPopover();
+  }
+  function closePaidPopover(){
+    var pop = document.querySelector('.paid-popover');
+    if (pop) pop.remove();
+    document.removeEventListener('mousedown', onOutsideClick);
+  }
+
+  function escapeHTML(s){ return String(s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+
+  function populateYearSelect(){
+    var years = {};
+    state.dossiers.forEach(function(d){ if (d.dateNotaire) years[d.dateNotaire.slice(0,4)] = true; });
+    years[String(state.year)] = true;
+    years[String(new Date().getFullYear())] = true;
+    var list = Object.keys(years).sort();
+    var sel = document.getElementById('yearSelect');
+    var current = sel.value;
+    sel.innerHTML = list.map(function(y){ return '<option value="'+y+'">'+y+'</option>'; }).join('');
+    sel.value = String(state.year);
+  }
+
+  /* ---------------- drawer / form ---------------- */
+  function openDrawer(d){
+    state.editingId = d ? d.id : null;
+    document.getElementById('drawerTitle').textContent = d ? 'Modifier le dossier' : 'Nouveau dossier';
+    document.getElementById('btnDelete').style.display = d ? 'inline-flex' : 'none';
+    document.getElementById('fNom').value = d ? d.nom : '';
+    document.getElementById('fStatut').value = d ? d.statut : 'En attente';
+    document.getElementById('fHonoraires').value = d ? d.honoraires : '';
+    document.getElementById('fDateNotaire').value = d ? d.dateNotaire : '';
+    var diff = !!(d && d.dateEncaissement && d.dateEncaissement !== d.dateNotaire);
+    document.getElementById('fEncaissementDiff').checked = diff;
+    document.getElementById('fDateEncaissement').value = diff ? d.dateEncaissement : (d ? d.dateNotaire : '');
+    document.getElementById('fDateEncaissement').disabled = !diff;
+    document.getElementById('fPartenaire').value = d ? (d.partenaire||'') : '';
+    var type = d ? d.type : 'NORMAL';
+    document.querySelectorAll('#typeGroup input').forEach(function(r){ r.checked = (r.value===type); });
+    updateTypeVisibility(type);
+
+    var taux = d ? d.taux : 'AUTO';
+    var standard = ['AUTO','0.53','0.55','0.6','1'];
+    var tauxSelect = document.getElementById('fTaux');
+    if (taux === 'AUTO' || standard.indexOf(String(taux))>-1){
+      tauxSelect.value = String(taux);
+      document.getElementById('tauxCustomField').style.display = 'none';
+    } else {
+      tauxSelect.value = 'custom';
+      document.getElementById('fTauxCustom').value = Math.round(Number(taux)*100);
+      document.getElementById('tauxCustomField').style.display = 'block';
+    }
+
+    updatePreview();
+    document.getElementById('drawer').classList.add('open');
+    document.getElementById('scrim').classList.add('open');
+    document.getElementById('fNom').focus();
+  }
+
+  function closeDrawer(){
+    document.getElementById('drawer').classList.remove('open');
+    document.getElementById('scrim').classList.remove('open');
+    state.editingId = null;
+  }
+
+  function updateTypeVisibility(type){
+    document.getElementById('partenaireField').style.display = (type==='APPORTEUR') ? 'block' : 'none';
+    var partenaireInput = document.getElementById('fPartenaire');
+    if (type==='APPORTEUR' && !partenaireInput.value.trim()){ partenaireInput.value = 'VousFinancer'; }
+    var tauxSelect = document.getElementById('fTaux');
+    if (type !== 'NORMAL' && tauxSelect.value === 'AUTO'){ tauxSelect.value = '1'; }
+    document.getElementById('tauxCustomField').style.display = (tauxSelect.value==='custom') ? 'block' : 'none';
+  }
+
+  function readFormDossier(){
+    var type = document.querySelector('#typeGroup input:checked').value;
+    var tauxRaw = document.getElementById('fTaux').value;
+    var taux = tauxRaw==='AUTO' ? 'AUTO' : (tauxRaw==='custom' ? (Number(document.getElementById('fTauxCustom').value)||0)/100 : Number(tauxRaw));
+    return {
+      nom: document.getElementById('fNom').value.trim(),
+      type: type,
+      partenaire: type==='APPORTEUR' ? document.getElementById('fPartenaire').value.trim() : '',
+      statut: document.getElementById('fStatut').value,
+      honoraires: Number(document.getElementById('fHonoraires').value)||0,
+      dateNotaire: document.getElementById('fDateNotaire').value,
+      dateEncaissement: document.getElementById('fEncaissementDiff').checked
+        ? document.getElementById('fDateEncaissement').value
+        : document.getElementById('fDateNotaire').value,
+      taux: taux
+    };
+  }
+
+  function updatePreview(){
+    var d = readFormDossier();
+    if (!d.honoraires || !d.dateNotaire){
+      document.getElementById('preview').innerHTML = '<h3>Aperçu du calcul</h3><div class="preview-row"><span class="l">Renseigne les honoraires et la date notaire</span></div>';
+      return;
+    }
+    var all = yearDossiers().filter(function(x){ return x.id !== state.editingId; });
+    all.push(Object.assign({ id:'__preview__' }, d));
+    var autoRates = monthlyAutoRates(all, state.settings);
+    var c = computeDossier(d, autoRates, state.settings);
+    document.getElementById('preview').innerHTML =
+      '<h3>Aperçu du calcul</h3>' +
+      row('CA HT', c.caHT) + row('Taux appliqué', (Math.round(c.taux*10000)/100)+' %', true) +
+      row('Commission brute HT', c.commissionBrute) +
+      (d.type==='NORMAL' ? row('Participation ('+(state.settings.participation*100).toFixed(0)+' %)', -c.participationEUR) : '') +
+      row('Commission nette HT', c.commissionNette) +
+      row('TVA ('+(state.settings.tva*100).toFixed(0)+' %)', c.tvaCommission) +
+      row('Total à facturer TTC', c.totalFactureTTC) +
+      row('URSSAF ('+(state.settings.urssaf*100).toFixed(2)+' %)', -c.urssafMontant) +
+      '<div class="preview-row total"><span class="l">Net à percevoir</span><span class="v">'+euro2.format(c.netAPercevoir)+'</span></div>';
+
+    function row(label, val, raw){
+      var v = raw ? val : euro2.format(val);
+      return '<div class="preview-row"><span class="l">'+label+'</span><span class="v">'+v+'</span></div>';
+    }
+  }
+
+  /* ---------------- persistence ---------------- */
+  function saveDossier(){
+    var d = readFormDossier();
+    if (!d.nom){ toast('Indique un nom de dossier.'); return; }
+    if (!d.dateNotaire){ toast('Indique une date notaire.'); return; }
+    if (state.editingId){
+      var idx = state.dossiers.findIndex(function(x){ return x.id===state.editingId; });
+      d.id = state.editingId;
+      d.createdAt = state.dossiers[idx].createdAt || dossierCreatedAt(state.dossiers[idx]); // conserve la date d'ajout d'origine
+      state.dossiers[idx] = d;
+    } else {
+      d.id = uid();
+      d.createdAt = new Date().toISOString();
+      state.dossiers.push(d);
+    }
+    closeDrawer();
+    render();
+    toast('Dossier enregistré.');
+    persistDossier(d);
+  }
+
+  function deleteDossier(){
+    if (!state.editingId) return;
+    var id = state.editingId;
+    state.dossiers = state.dossiers.filter(function(x){ return x.id!==id; });
+    closeDrawer();
+    render();
+    persistDelete(id);
+    toast('Dossier supprimé.');
+  }
+
+  // wrappé en try/catch : un appel db qui échoue ou lève une erreur ne doit
+  // jamais bloquer le reste de l'action en cours (fermeture de popover, rendu…) —
+  // dans le pire des cas, on retombe sur la sauvegarde locale.
+  function persistDossier(d){
+    try{
+      if (state.db){
+        state.db.collection('dossiers').doc(d.id).set(d).catch(function(){ toast('Sync impossible, sauvegardé localement.'); saveLocal(); });
+      } else {
+        saveLocal();
+      }
+    }catch(e){ toast('Sync impossible, sauvegardé localement.'); saveLocal(); }
+  }
+  function persistDelete(id){
+    try{
+      if (state.db){
+        state.db.collection('dossiers').doc(id).delete().catch(function(){ saveLocal(); });
+      } else {
+        saveLocal();
+      }
+    }catch(e){ saveLocal(); }
+  }
+  function persistSettings(){
+    try{
+      if (state.db){
+        state.db.doc('config/settings').set(state.settings).catch(function(){ saveLocal(); });
+      } else {
+        saveLocal();
+      }
+    }catch(e){ saveLocal(); }
+    render();
+  }
+  function saveLocal(){
+    try{
+      localStorage.setItem('remuneration_dossiers', JSON.stringify(state.dossiers));
+      localStorage.setItem('remuneration_settings', JSON.stringify(state.settings));
+    }catch(e){}
+  }
+  function loadLocal(){
+    try{
+      var dd = localStorage.getItem('remuneration_dossiers');
+      var ss = localStorage.getItem('remuneration_settings');
+      if (dd) state.dossiers = JSON.parse(dd);
+      if (ss) state.settings = JSON.parse(ss);
+    }catch(e){}
+  }
+
+  function setSyncStatus(mode){
+    var pill = document.getElementById('syncPill');
+    var label = document.getElementById('syncLabel');
+    pill.className = 'sync-pill ' + mode;
+    label.textContent = mode==='live' ? 'Synchronisé' : (mode==='local' ? 'Hors ligne (cet appareil)' : 'Connexion…');
+  }
+
+  /* ---------------- toast ---------------- */
+  var toastTimer = null;
+  function toast(msg){
+    var stack = document.getElementById('toastStack');
+    var el = document.createElement('div');
+    el.className = 'toast';
+    el.textContent = msg;
+    stack.appendChild(el);
+    requestAnimationFrame(function(){ el.classList.add('show'); });
+    setTimeout(function(){
+      el.classList.remove('show');
+      setTimeout(function(){ el.remove(); }, 200);
+    }, 2600);
+  }
+
+  /* ---------------- settings panel ---------------- */
+  function fillSettingsForm(){
+    document.getElementById('cfgTva').value = (state.settings.tva*100).toFixed(2).replace(/\.00$/,'');
+    document.getElementById('cfgParticipation').value = (state.settings.participation*100).toFixed(2).replace(/\.00$/,'');
+    document.getElementById('cfgUrssaf').value = (state.settings.urssaf*100).toFixed(2).replace(/\.00$/,'');
+    document.getElementById('cfgObjectif').value = state.settings.objectifAnnuel;
+    document.getElementById('cfgObjectifMensuel').value = Math.round(state.settings.objectifAnnuel/12);
+    document.getElementById('cfgPlafond').value = state.settings.plafond;
+    var tierRows = document.getElementById('tierRows');
+    tierRows.innerHTML = state.settings.seuils.map(function(t,i){
+      return '<div class="tier-row">'+
+        '<input type="number" data-tier="'+i+'" data-f="bas" value="'+t.bas+'">'+
+        '<input type="number" data-tier="'+i+'" data-f="haut" value="'+t.haut+'">'+
+        '<input type="number" data-tier="'+i+'" data-f="taux" value="'+(Math.round(t.taux*10000)/100)+'">'+
+        '</div>';
+    }).join('');
+  }
+
+  function saveSettingsFromForm(){
+    state.settings.tva = Number(document.getElementById('cfgTva').value)/100;
+    state.settings.participation = Number(document.getElementById('cfgParticipation').value)/100;
+    state.settings.urssaf = Number(document.getElementById('cfgUrssaf').value)/100;
+    state.settings.objectifAnnuel = Number(document.getElementById('cfgObjectif').value);
+    state.settings.plafond = Number(document.getElementById('cfgPlafond').value);
+    var rows = document.querySelectorAll('#tierRows .tier-row');
+    var seuils = [];
+    rows.forEach(function(row){
+      var bas = Number(row.querySelector('[data-f="bas"]').value);
+      var haut = Number(row.querySelector('[data-f="haut"]').value);
+      var taux = Number(row.querySelector('[data-f="taux"]').value)/100;
+      seuils.push({ bas:bas, haut:haut, taux:taux });
+    });
+    if (seuils.length) state.settings.seuils = seuils;
+    persistSettings();
+    var savedEl = document.getElementById('settingsSaved');
+    savedEl.textContent = 'Enregistré ✓';
+    setTimeout(function(){ savedEl.textContent=''; }, 2000);
+  }
+
+  /* ---------------- wiring ---------------- */
+  function wire(){
+    document.getElementById('btnNew').addEventListener('click', function(){ openDrawer(null); });
+    document.getElementById('btnCloseDrawer').addEventListener('click', closeDrawer);
+    document.getElementById('btnCancel').addEventListener('click', closeDrawer);
+    document.getElementById('scrim').addEventListener('click', closeDrawer);
+    document.getElementById('btnSave').addEventListener('click', saveDossier);
+    document.getElementById('btnDelete').addEventListener('click', deleteDossier);
+    document.addEventListener('keydown', function(e){ if (e.key==='Escape') closeDrawer(); });
+
+    document.getElementById('toggleIncludeAttente').addEventListener('change', function(e){
+      state.includeAttente = e.target.checked;
+      var all = yearDossiers();
+      var autoRates = monthlyAutoRates(all, state.settings);
+      var included = includedDossiers(all);
+      var computed = included.map(function(d){ return { d:d, c: computeDossier(d, autoRates, state.settings) }; });
+      renderKPIs(computed, all);
+    });
+
+    document.querySelectorAll('#typeGroup input').forEach(function(r){
+      r.addEventListener('change', function(){ updateTypeVisibility(r.value); updatePreview(); });
+    });
+    document.getElementById('fTaux').addEventListener('change', function(e){
+      document.getElementById('tauxCustomField').style.display = (e.target.value==='custom') ? 'block' : 'none';
+      updatePreview();
+    });
+    document.getElementById('fDateNotaire').addEventListener('input', function(e){
+      if (!document.getElementById('fEncaissementDiff').checked){
+        document.getElementById('fDateEncaissement').value = e.target.value;
+      }
+    });
+    document.getElementById('fEncaissementDiff').addEventListener('change', function(e){
+      var enc = document.getElementById('fDateEncaissement');
+      enc.disabled = !e.target.checked;
+      if (!e.target.checked){ enc.value = document.getElementById('fDateNotaire').value; }
+      updatePreview();
+    });
+    ['fNom','fStatut','fHonoraires','fDateNotaire','fDateEncaissement','fTauxCustom','fPartenaire'].forEach(function(id){
+      document.getElementById(id).addEventListener('input', updatePreview);
+      document.getElementById(id).addEventListener('change', updatePreview);
+    });
+
+    document.getElementById('yearSelect').addEventListener('change', function(e){
+      state.year = Number(e.target.value); render();
+    });
+
+    document.getElementById('tabs').addEventListener('click', function(e){
+      var btn = e.target.closest('.tab');
+      if (!btn) return;
+      document.querySelectorAll('.tab').forEach(function(t){ t.classList.remove('active'); });
+      btn.classList.add('active');
+      state.tab = btn.getAttribute('data-tab');
+      renderTable(yearDossiers(), monthlyAutoRates(yearDossiers(), state.settings));
+    });
+
+    document.getElementById('searchInput').addEventListener('input', function(e){
+      state.search = e.target.value;
+      renderTable(yearDossiers(), monthlyAutoRates(yearDossiers(), state.settings));
+    });
+
+    document.getElementById('sortSelect').addEventListener('change', function(e){
+      state.sortKey = e.target.value;
+      renderTable(yearDossiers(), monthlyAutoRates(yearDossiers(), state.settings));
+    });
+
+    document.getElementById('simHonoraires').addEventListener('input', function(e){
+      var raw = parseThousands(e.target.value);
+      e.target.value = raw ? formatThousands(raw) : '';
+      var all = yearDossiers();
+      var autoRates = monthlyAutoRates(all, state.settings);
+      var included = includedDossiers(all);
+      var computed = included.map(function(d){ return { d:d, c: computeDossier(d, autoRates, state.settings) }; });
+      renderKPIs(computed, all);
+    });
+
+    document.getElementById('btnSaveSettings').addEventListener('click', saveSettingsFromForm);
+
+    document.getElementById('cfgObjectif').addEventListener('input', function(e){
+      var v = Number(e.target.value)||0;
+      document.getElementById('cfgObjectifMensuel').value = Math.round(v/12);
+    });
+    document.getElementById('cfgObjectifMensuel').addEventListener('input', function(e){
+      var v = Number(e.target.value)||0;
+      document.getElementById('cfgObjectif').value = Math.round(v*12);
+    });
+  }
+
+  /* ---------------- db bootstrap ---------------- */
+  function seedIfEmpty(){
+    if (state.dossiers.length) return;
+    SEED_DOSSIERS.forEach(function(s){
+      var d = Object.assign({}, s);
+      if (!d.id) d.id = uid();
+      state.dossiers.push(d);
+      if (state.db) state.db.collection('dossiers').doc(d.id).set(d).catch(function(){});
+    });
+    if (state.db) state.db.doc('config/settings').set(state.settings).catch(function(){});
+  }
+
+  /* ---------------- Firebase Auth + Firestore ---------------- */
+  var firebaseConfig = {
+    apiKey: "AIzaSyDxuWv9GQt4I2vdQH0kbX-u9Dp-IFaxM6A",
+    authDomain: "remuneration-arthurimmo.firebaseapp.com",
+    projectId: "remuneration-arthurimmo",
+    storageBucket: "remuneration-arthurimmo.firebasestorage.app",
+    messagingSenderId: "573906800491",
+    appId: "1:573906800491:web:f1e58ebb7bcd64ebb2062e"
+  };
+  // Seul ce compte a le droit de lire/écrire les données (appliqué aussi côté
+  // règles Firestore : cette vérification côté client n'est qu'un filet de
+  // sécurité supplémentaire pour éviter d'afficher des données à un mauvais compte).
+  var ALLOWED_UID = "kEEUI7PHhFWSrvBIyVa1YrPfgVn2";
+
+  firebase.initializeApp(firebaseConfig);
+  var auth = firebase.auth();
+  var unsubDossiers = null, unsubSettings = null;
+
+  function showLogin(msg){
+    document.getElementById('appRoot').classList.remove('ready');
+    document.getElementById('loginOverlay').hidden = false;
+    document.getElementById('loginError').textContent = msg || '';
+    document.getElementById('btnLoginSubmit').disabled = false;
+    document.getElementById('btnLoginSubmit').textContent = 'Se connecter';
+  }
+  function hideLogin(){
+    document.getElementById('loginOverlay').hidden = true;
+    document.getElementById('appRoot').classList.add('ready');
+  }
+
+  function stopSync(){
+    if (unsubDossiers){ unsubDossiers(); unsubDossiers = null; }
+    if (unsubSettings){ unsubSettings(); unsubSettings = null; }
+  }
+
+  function wireAuthUI(){
+    document.getElementById('loginForm').addEventListener('submit', function(e){
+      e.preventDefault();
+      var email = document.getElementById('loginEmail').value.trim();
+      var pass = document.getElementById('loginPassword').value;
+      var btn = document.getElementById('btnLoginSubmit');
+      btn.disabled = true; btn.textContent = 'Connexion…';
+      document.getElementById('loginError').textContent = '';
+      auth.signInWithEmailAndPassword(email, pass).catch(function(err){
+        btn.disabled = false; btn.textContent = 'Se connecter';
+        document.getElementById('loginError').textContent = "Connexion impossible : e-mail ou mot de passe incorrect.";
+      });
+    });
+    document.getElementById('btnLogout').addEventListener('click', function(){
+      stopSync();
+      auth.signOut();
+    });
+  }
+
+  async function onSignedIn(user){
+    state.db = firebase.firestore();
+    hideLogin();
+    setSyncStatus('connecting');
+    try{
+      var settingsSnap = await state.db.doc('config/settings').get();
+      if (settingsSnap.exists){
+        state.settings = Object.assign({}, DEFAULT_SETTINGS, settingsSnap.data());
+      }
+      var dossiersSnap = await state.db.collection('dossiers').get();
+      if (dossiersSnap.size){
+        state.dossiers = dossiersSnap.docs.map(function(doc){ return doc.data(); });
+      }
+      seedIfEmpty();
+      fillSettingsForm();
+      render();
+      setSyncStatus('live');
+
+      unsubDossiers = state.db.collection('dossiers').onSnapshot(function(snap){
+        state.dossiers = snap.docs.map(function(doc){ return doc.data(); });
+        render();
+      }, function(){ setSyncStatus('local'); });
+
+      unsubSettings = state.db.doc('config/settings').onSnapshot(function(snap){
+        if (snap.exists){
+          state.settings = Object.assign({}, DEFAULT_SETTINGS, snap.data());
+          fillSettingsForm();
+          render();
+        }
+      }, function(){});
+    }catch(e){
+      setSyncStatus('local');
+      render();
+    }
+  }
+
+  function boot(){
+    wire();
+    wireAuthUI();
+    fillSettingsForm();
+    showLogin();
+
+    auth.onAuthStateChanged(function(user){
+      stopSync();
+      if (!user){
+        state.db = null;
+        showLogin();
+        return;
+      }
+      if (user.uid !== ALLOWED_UID){
+        showLogin("Ce compte n'est pas autorisé à accéder à ce registre.");
+        auth.signOut();
+        return;
+      }
+      onSignedIn(user);
+    });
+  }
+
+  boot();
+})();
+</script>
+</body>
+</html>
