@@ -30,9 +30,9 @@
     --warn-soft:#FBEED2;
     --neg:#DD4B4B;
     --neg-soft:#FCE1E1;
-    --amber:#D9720C;
+    --amber:#F97316;
     --amber-ink:#FFFFFF;
-    --amber-soft:#FBE7D2;
+    --amber-soft:#FDE6D3;
     --chart-1:#16A672;
     --chart-2:#4C5FE0;
     --shadow-sm: 0 1px 2px rgba(23,26,43,.06);
@@ -63,7 +63,7 @@
       --warn-soft:#3A2E17;
       --neg:#E36767;
       --neg-soft:#3A2020;
-      --amber:#E8923D;
+      --amber:#FB923C;
       --amber-ink:#1A1200;
       --amber-soft:#3D2A12;
       --chart-1:#20A87A;
@@ -91,7 +91,7 @@
     --warn-soft:#3A2E17;
     --neg:#E36767;
     --neg-soft:#3A2020;
-    --amber:#E8923D;
+    --amber:#FB923C;
     --amber-ink:#1A1200;
     --amber-soft:#3D2A12;
     --chart-1:#20A87A;
@@ -257,7 +257,7 @@
   /* ---------- dossiers section ---------- */
   .dossiers-card{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); box-shadow:var(--shadow-sm); overflow:hidden; margin-bottom:14px; }
   .dossiers-head{ display:flex; align-items:center; justify-content:space-between; gap:14px; padding:18px 22px 0; flex-wrap:wrap; }
-  .dossiers-toolbar{ padding:12px 22px 0; }
+  .tabs-actions{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
   .tabs{ display:flex; gap:4px; background:var(--surface-2); padding:4px; border-radius:999px; }
   .tab{ border:none; background:transparent; padding:7px 14px; border-radius:999px; font-size:12.5px; font-weight:600; color:var(--ink-2); cursor:pointer; }
   .tab.active{ background:var(--surface); color:var(--ink); box-shadow:var(--shadow-sm); }
@@ -414,6 +414,41 @@
   .invoice-diff-current{ color:var(--ink-3); font-style:italic; font-size:12px; }
   .invoice-diff-zero{ color:var(--ink-3); }
 
+  .tax-selected-list{ display:flex; flex-direction:column; gap:4px; margin-bottom:4px; }
+  .tax-selected-row{ display:flex; align-items:center; justify-content:space-between; gap:8px; font-size:13px; padding:4px 2px; }
+  .tax-section-title{
+    font-size:12px; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-3); font-weight:700;
+    margin:20px 0 12px; padding-top:16px; border-top:1px solid var(--border); font-family:var(--font-body);
+  }
+  .tax-expense-form{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px; }
+  .tax-expense-form input, .tax-expense-form select{
+    border:1px solid var(--border); background:var(--bg); border-radius:6px; padding:7px 9px; font-size:13px; color:var(--ink);
+  }
+  .tax-expense-form input[type="text"]{ flex:1 1 150px; min-width:120px; }
+  .tax-expense-form input[type="number"]{ width:110px; }
+  .tax-expense-form input[type="date"]{ width:140px; }
+  .tax-expense-form select{ width:82px; }
+  .tax-expense-list{ display:flex; flex-direction:column; gap:2px; margin-bottom:10px; max-height:230px; overflow-y:auto; }
+  .tax-expense-row{ display:flex; align-items:center; gap:10px; padding:7px 6px; border-radius:var(--radius-sm); font-size:12.5px; }
+  .tax-expense-row:hover{ background:var(--surface-2); }
+  .tax-expense-date{ color:var(--ink-3); flex-shrink:0; width:72px; }
+  .tax-expense-desc{ flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .tax-expense-amount{ color:var(--ink-2); flex-shrink:0; }
+  .tax-expense-taux{ color:var(--ink-3); flex-shrink:0; width:46px; text-align:right; }
+  .tax-expense-ded{ color:var(--amber); font-weight:600; flex-shrink:0; width:76px; text-align:right; }
+  .tax-expense-delete{
+    border:none; background:transparent; color:var(--ink-3); cursor:pointer; font-size:14px; padding:2px 8px;
+    border-radius:6px; flex-shrink:0; line-height:1.6;
+  }
+  .tax-expense-delete:hover{ background:var(--neg-soft); color:var(--neg); }
+  .tax-total-line{
+    display:flex; align-items:center; justify-content:space-between; font-size:13px; color:var(--ink-2);
+    padding:10px 2px; border-top:1px solid var(--border);
+  }
+  .tax-net-due .invoice-item-card{ background:var(--amber-soft); }
+  .tax-net-credit .invoice-item-card{ background:var(--pos-soft); }
+  .tax-net-credit .invoice-item-card h4{ color:var(--pos); }
+
   .toast-stack{ position:fixed; bottom:20px; left:50%; transform:translateX(-50%); z-index:40; display:flex; flex-direction:column; gap:8px; align-items:center; }
   .toast{ background:var(--ink); color:var(--bg); padding:10px 16px; border-radius:999px; font-size:13px; box-shadow:var(--shadow-lg); opacity:0; transform:translateY(6px); transition:all .18s ease; }
   .toast.show{ opacity:1; transform:translateY(0); }
@@ -535,6 +570,7 @@
       </div>
       <button class="btn btn-primary" id="btnNew">+ Nouveau dossier</button>
       <button class="btn btn-amber" id="btnInvoiceHelperTop">🧾 Préparer facture</button>
+      <button class="btn btn-amber" id="btnTaxHelperTop">🏛️ Impôts</button>
       <button class="btn btn-ghost btn-sm" id="btnLogout" title="Se déconnecter">Déconnexion</button>
     </div>
   </header>
@@ -602,10 +638,13 @@
 
     <section class="dossiers-card">
       <div class="dossiers-head">
-        <div class="tabs" id="tabs">
-          <button class="tab active" data-tab="attente">En attente</button>
-          <button class="tab" data-tab="paye">Payés</button>
-          <button class="tab" data-tab="tous">Tous</button>
+        <div class="tabs-actions">
+          <div class="tabs" id="tabs">
+            <button class="tab active" data-tab="attente">En attente</button>
+            <button class="tab" data-tab="paye">Payés</button>
+            <button class="tab" data-tab="tous">Tous</button>
+          </div>
+          <button class="btn btn-amber btn-sm" id="btnInvoiceHelperTable">🧾 Préparer facture</button>
         </div>
         <div class="search-row">
           <div class="field-inline sort-field">
@@ -623,9 +662,6 @@
           </div>
           <input type="search" id="searchInput" placeholder="Rechercher un dossier…">
         </div>
-      </div>
-      <div class="dossiers-toolbar">
-        <button class="btn btn-amber btn-sm" id="btnInvoiceHelperTable">🧾 Préparer facture</button>
       </div>
       <div class="table-scroll">
         <table class="dossiers">
@@ -793,6 +829,33 @@
   </div>
 </div>
 
+<div class="scrim" id="taxScrim"></div>
+<div class="invoice-modal" id="taxModal" role="dialog" aria-modal="true" aria-labelledby="taxModalTitle">
+  <div class="invoice-modal-head">
+    <h2 id="taxModalTitle">🏛️ Impôts</h2>
+    <button class="btn btn-ghost btn-sm" id="btnCloseTax" aria-label="Fermer">✕</button>
+  </div>
+  <div class="invoice-modal-body">
+    <div class="invoice-hint">Reprend la sélection actuelle de « Préparer facture » pour le montant HT et la TVA collectée à déclarer à l'URSSAF. Ajoute tes dépenses professionnelles (montant TTC vu sur ton compte pro) pour calculer la TVA déductible.</div>
+    <div id="taxSelectionSummary"></div>
+    <h3 class="tax-section-title">Dépenses professionnelles (TVA déductible)</h3>
+    <div class="tax-expense-form">
+      <input type="text" id="taxExpDesc" placeholder="Description (optionnel)">
+      <input type="number" id="taxExpMontant" placeholder="Montant TTC" step="0.01" min="0">
+      <select id="taxExpTaux">
+        <option value="20">20 %</option>
+        <option value="10">10 %</option>
+        <option value="5.5">5,5 %</option>
+        <option value="2.1">2,1 %</option>
+      </select>
+      <input type="date" id="taxExpDate">
+      <button type="button" class="btn btn-sm btn-primary" id="btnAddExpense">Ajouter</button>
+    </div>
+    <div class="tax-expense-list" id="taxExpenseList"></div>
+    <div class="tax-totals" id="taxTotals"></div>
+  </div>
+</div>
+
 <div class="toast-stack" id="toastStack"></div>
 
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
@@ -866,6 +929,7 @@
   var state = {
     settings: JSON.parse(JSON.stringify(DEFAULT_SETTINGS)),
     dossiers: [],
+    depenses: [],
     year: 2026,
     tab: 'attente',
     search: '',
@@ -1509,18 +1573,41 @@
     }catch(e){ saveLocal(); }
     render();
   }
+  // dépenses pro (aide « Impôts » — TVA déductible) : même schéma de persistance
+  // que les dossiers (collection Firestore dédiée « depenses »), avec repli local.
+  function persistDepense(d){
+    try{
+      if (state.db){
+        state.db.collection('depenses').doc(d.id).set(d).catch(function(){ toast('Sync impossible, sauvegardé localement.'); saveLocal(); });
+      } else {
+        saveLocal();
+      }
+    }catch(e){ toast('Sync impossible, sauvegardé localement.'); saveLocal(); }
+  }
+  function persistDepenseDelete(id){
+    try{
+      if (state.db){
+        state.db.collection('depenses').doc(id).delete().catch(function(){ saveLocal(); });
+      } else {
+        saveLocal();
+      }
+    }catch(e){ saveLocal(); }
+  }
   function saveLocal(){
     try{
       localStorage.setItem('remuneration_dossiers', JSON.stringify(state.dossiers));
       localStorage.setItem('remuneration_settings', JSON.stringify(state.settings));
+      localStorage.setItem('remuneration_depenses', JSON.stringify(state.depenses));
     }catch(e){}
   }
   function loadLocal(){
     try{
       var dd = localStorage.getItem('remuneration_dossiers');
       var ss = localStorage.getItem('remuneration_settings');
+      var pp = localStorage.getItem('remuneration_depenses');
       if (dd) state.dossiers = JSON.parse(dd);
       if (ss) state.settings = JSON.parse(ss);
+      if (pp) state.depenses = JSON.parse(pp);
     }catch(e){}
   }
 
@@ -1900,6 +1987,156 @@
     document.getElementById('invoiceModal').classList.remove('open');
   }
 
+  /* ---------------- aide fiscale (« Impôts » — URSSAF & TVA) ---------------- */
+  // Reprend volontairement la sélection en cours de « Préparer facture »
+  // (invoiceHelper.selected) plutôt que d'avoir sa propre liste à cocher :
+  // le montant HT à déclarer à l'URSSAF, c'est exactement le total HT des
+  // dossiers que Séb vient de facturer dans Indy. Choix confirmé par Séb.
+  var TAX_TVA_RATES = [20, 10, 5.5, 2.1];
+
+  function wireCopyButtons(container){
+    container.querySelectorAll('.btn-copy').forEach(function(btn){
+      btn.addEventListener('click', function(){ copyToClipboard(btn.getAttribute('data-copy'), btn); });
+    });
+  }
+
+  // Reproduit exactement l'arrondi de la vraie facture Indy : chaque ligne
+  // « Prix unitaire HT » y est déjà arrondie à 2 décimales (c'est le nombre que
+  // Séb recopie), et la ligne « Participation 3 % » combinée n'est arrondie
+  // qu'une seule fois (même règle que renderInvoiceResults). Sommer les valeurs
+  // brutes puis arrondir une seule fois à la toute fin donnerait parfois 1
+  // centime d'écart avec le total HT réellement affiché sur la facture.
+  function taxSelectionTotals(){
+    var ids = selectedInvoiceIds();
+    var byId = {};
+    state.dossiers.forEach(function(d){ byId[d.id] = d; });
+    var all = yearDossiers();
+    var autoRates = monthlyAutoRates(all, state.settings);
+    var rows = [];
+    var sumHTLines = 0;
+    var participationTotal = 0;
+    ids.forEach(function(id){
+      var d = byId[id];
+      if (!d) return;
+      var line = invoiceLineFor(d, autoRates);
+      var htLine = Math.round(line.commissionBrute * 100) / 100;
+      sumHTLines += htLine;
+      participationTotal += line.participationEUR;
+      rows.push({ d: d, ht: htLine });
+    });
+    participationTotal = Math.round(participationTotal * 100) / 100;
+    var totalHT = Math.round((sumHTLines - participationTotal) * 100) / 100;
+    var tva = Math.round(totalHT * state.settings.tva * 100) / 100;
+    return { rows: rows, totalHT: totalHT, tva: tva, participationTotal: participationTotal };
+  }
+
+  function renderTaxSelectionSummary(){
+    var el = document.getElementById('taxSelectionSummary');
+    var t = taxSelectionTotals();
+    if (!t.rows.length){
+      el.innerHTML = '<div class="invoice-empty">Aucun dossier sélectionné pour l’instant — coche des dossiers dans « Préparer facture » pour voir le montant HT et la TVA à déclarer ici.</div>';
+      return;
+    }
+    var listHtml = t.rows.map(function(r){
+      return '<div class="tax-selected-row"><span>'+escapeHTML(r.d.nom)+'</span><span class="invoice-row-date">'+escapeHTML(invoiceMoisNotaireLabel(r.d))+'</span></div>';
+    }).join('');
+    el.innerHTML =
+      '<div class="tax-selected-list">'+listHtml+'</div>' +
+      invoiceFieldCard('Montants à déclarer (sélection « Préparer facture »)', [
+        { label: 'Total HT (URSSAF)', value: rawFr(t.totalHT) },
+        { label: 'TVA collectée', value: rawFr(t.tva) }
+      ]);
+    wireCopyButtons(el);
+  }
+
+  function depenseDeduction(d){
+    var taux = Number(d.tauxTva) || 0;
+    var montant = Number(d.montantTTC) || 0;
+    return montant * (taux / 100) / (1 + taux / 100);
+  }
+
+  function formatDateFr(iso){
+    if (!iso) return '—';
+    var p = iso.split('-');
+    if (p.length !== 3) return iso;
+    return p[2] + '/' + p[1] + '/' + p[0];
+  }
+
+  function renderTaxExpenses(){
+    var el = document.getElementById('taxExpenseList');
+    var list = state.depenses.slice().sort(function(a,b){ return (b.date||'').localeCompare(a.date||''); });
+    if (!list.length){
+      el.innerHTML = '<div class="invoice-empty">Aucune dépense enregistrée pour l’instant.</div>';
+    } else {
+      el.innerHTML = list.map(function(d){
+        var ded = depenseDeduction(d);
+        return '<div class="tax-expense-row">' +
+          '<span class="tax-expense-date">'+formatDateFr(d.date)+'</span>' +
+          '<span class="tax-expense-desc">'+escapeHTML(d.description || '—')+'</span>' +
+          '<span class="tax-expense-amount">'+rawFr(d.montantTTC)+' € TTC</span>' +
+          '<span class="tax-expense-taux">'+rawFr(Number(d.tauxTva))+' %</span>' +
+          '<span class="tax-expense-ded">-'+fixed2Fr(ded)+' €</span>' +
+          '<button type="button" class="tax-expense-delete" data-delete-id="'+d.id+'" aria-label="Supprimer">✕</button>' +
+        '</div>';
+      }).join('');
+      el.querySelectorAll('.tax-expense-delete').forEach(function(btn){
+        btn.addEventListener('click', function(){ deleteDepense(btn.getAttribute('data-delete-id')); });
+      });
+    }
+    renderTaxTotals();
+  }
+
+  function renderTaxTotals(){
+    var el = document.getElementById('taxTotals');
+    var totalDed = state.depenses.reduce(function(sum, d){ return sum + depenseDeduction(d); }, 0);
+    totalDed = Math.round(totalDed * 100) / 100;
+    var t = taxSelectionTotals();
+    var net = Math.round((t.tva - totalDed) * 100) / 100;
+    var isCredit = net < 0;
+    var netLabel = isCredit ? 'Crédit de TVA (rien à payer ce mois-ci)' : 'TVA nette à déclarer';
+    el.innerHTML =
+      '<div class="tax-total-line"><span>Total TVA déductible ('+state.depenses.length+' dépense'+(state.depenses.length>1?'s':'')+')</span><span>-'+fixed2Fr(totalDed)+' €</span></div>' +
+      '<div class="'+(isCredit?'tax-net-credit':'tax-net-due')+'">' +
+        invoiceFieldCard(netLabel, [{ label: 'Montant', value: fixed2Fr(Math.abs(net)) }]) +
+      '</div>';
+    wireCopyButtons(el);
+  }
+
+  function addDepense(){
+    var montant = Number(document.getElementById('taxExpMontant').value);
+    if (!montant || montant <= 0){ toast('Indique un montant TTC valide.'); return; }
+    var taux = Number(document.getElementById('taxExpTaux').value);
+    var desc = document.getElementById('taxExpDesc').value.trim();
+    var date = document.getElementById('taxExpDate').value || new Date().toISOString().slice(0,10);
+    var d = { id: uid(), description: desc, montantTTC: montant, tauxTva: taux, date: date };
+    state.depenses.push(d);
+    renderTaxExpenses();
+    persistDepense(d);
+    document.getElementById('taxExpDesc').value = '';
+    document.getElementById('taxExpMontant').value = '';
+    document.getElementById('taxExpDate').value = new Date().toISOString().slice(0,10);
+    toast('Dépense ajoutée.');
+  }
+
+  function deleteDepense(id){
+    state.depenses = state.depenses.filter(function(x){ return x.id !== id; });
+    renderTaxExpenses();
+    persistDepenseDelete(id);
+    toast('Dépense supprimée.');
+  }
+
+  function openTaxHelper(){
+    document.getElementById('taxScrim').classList.add('open');
+    document.getElementById('taxModal').classList.add('open');
+    document.getElementById('taxExpDate').value = new Date().toISOString().slice(0,10);
+    renderTaxSelectionSummary();
+    renderTaxExpenses();
+  }
+  function closeTaxHelper(){
+    document.getElementById('taxScrim').classList.remove('open');
+    document.getElementById('taxModal').classList.remove('open');
+  }
+
   /* ---------------- wiring ---------------- */
   function wire(){
     document.getElementById('btnNew').addEventListener('click', function(){ openDrawer(null); });
@@ -1912,6 +2149,7 @@
       if (e.key!=='Escape') return;
       closeDrawer();
       closeInvoiceHelper();
+      closeTaxHelper();
     });
 
     document.getElementById('btnInvoiceHelperTop').addEventListener('click', openInvoiceHelper);
@@ -1919,6 +2157,11 @@
     document.getElementById('btnCloseInvoice').addEventListener('click', closeInvoiceHelper);
     document.getElementById('invoiceScrim').addEventListener('click', closeInvoiceHelper);
     document.getElementById('btnApplyBulkTaux').addEventListener('click', applyBulkInvoiceTaux);
+
+    document.getElementById('btnTaxHelperTop').addEventListener('click', openTaxHelper);
+    document.getElementById('btnCloseTax').addEventListener('click', closeTaxHelper);
+    document.getElementById('taxScrim').addEventListener('click', closeTaxHelper);
+    document.getElementById('btnAddExpense').addEventListener('click', addDepense);
 
     document.getElementById('toggleIncludeAttente').addEventListener('change', function(e){
       state.includeAttente = e.target.checked;
@@ -2025,7 +2268,7 @@
 
   firebase.initializeApp(firebaseConfig);
   var auth = firebase.auth();
-  var unsubDossiers = null, unsubSettings = null;
+  var unsubDossiers = null, unsubSettings = null, unsubDepenses = null;
 
   function showLogin(msg){
     document.getElementById('appRoot').classList.remove('ready');
@@ -2042,6 +2285,7 @@
   function stopSync(){
     if (unsubDossiers){ unsubDossiers(); unsubDossiers = null; }
     if (unsubSettings){ unsubSettings(); unsubSettings = null; }
+    if (unsubDepenses){ unsubDepenses(); unsubDepenses = null; }
   }
 
   function wireAuthUI(){
@@ -2076,6 +2320,10 @@
       if (dossiersSnap.size){
         state.dossiers = dossiersSnap.docs.map(function(doc){ return doc.data(); });
       }
+      var depensesSnap = await state.db.collection('depenses').get();
+      if (depensesSnap.size){
+        state.depenses = depensesSnap.docs.map(function(doc){ return doc.data(); });
+      }
       seedIfEmpty();
       fillSettingsForm();
       render();
@@ -2092,6 +2340,12 @@
           fillSettingsForm();
           render();
         }
+      }, function(){});
+
+      unsubDepenses = state.db.collection('depenses').onSnapshot(function(snap){
+        state.depenses = snap.docs.map(function(doc){ return doc.data(); });
+        var taxModal = document.getElementById('taxModal');
+        if (taxModal && taxModal.classList.contains('open')) renderTaxExpenses();
       }, function(){});
     }catch(e){
       setSyncStatus('local');
