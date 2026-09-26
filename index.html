@@ -377,6 +377,7 @@
   .invoice-row:hover{ background:var(--surface-2); }
   .invoice-row input[type="checkbox"]{ width:16px; height:16px; accent-color:var(--amber); flex-shrink:0; }
   .invoice-row-name{ flex:1; font-size:13.5px; font-weight:600; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .invoice-row-date{ font-size:11.5px; color:var(--ink-3); flex-shrink:0; background:var(--surface-2); border-radius:999px; padding:2px 8px; white-space:nowrap; }
   .invoice-row-meta{ font-size:12px; color:var(--ink-3); flex-shrink:0; }
   .invoice-row-taux{ display:flex; align-items:center; gap:4px; font-size:12.5px; color:var(--ink-2); flex-shrink:0; }
   .invoice-row-taux input{ width:48px; border:1px solid var(--border); background:var(--bg); border-radius:6px; padding:4px 6px; text-align:right; }
@@ -1603,6 +1604,11 @@
     return yearDossiers().filter(function(d){ return d.statut === 'En attente'; });
   }
 
+  function invoiceMoisNotaireLabel(d){
+    if (!d.dateNotaire) return '—';
+    return MOIS_FR_LONG[Number(d.dateNotaire.slice(5,7))-1] + ' ' + d.dateNotaire.slice(0,4);
+  }
+
   // taux effectif pour un dossier dans l'aide à la facturation : la valeur
   // tapée dans le champ (session en cours) sinon la valeur auto/enregistrée normale.
   function invoiceResolvedTauxPct(d, autoRates){
@@ -1700,8 +1706,6 @@
     var participationHtml = '';
     if (participationTotal > 0){
       participationHtml = invoiceFieldCard('Participation 3 % (sur l’ensemble de la sélection)', [
-        { label: "Nom de l'item", value: 'Participation 3% (*)' },
-        { label: 'Description', value: "*Retenue de 3 % au titre de la participation aux frais de communication et de la mise à disposition d'un poste de travail." },
         { label: 'Prix unitaire HT', value: '-' + fixed2Fr(participationTotal) }
       ]);
     }
@@ -1796,6 +1800,7 @@
         '<div class="invoice-row" data-row-id="'+d.id+'">' +
           '<input type="checkbox" data-invoice-id="'+d.id+'" '+checked+'>' +
           '<span class="invoice-row-name">'+escapeHTML(d.nom)+'</span>' +
+          '<span class="invoice-row-date">'+escapeHTML(invoiceMoisNotaireLabel(d))+'</span>' +
           '<span class="invoice-row-meta">'+euroSmart(Number(d.honoraires)||0)+'</span>' +
           '<span class="invoice-row-taux">' +
             '<input type="number" class="invoice-taux-input" data-taux-id="'+d.id+'" value="'+(pct.toString())+'" step="1" min="0" max="100"> %' +
