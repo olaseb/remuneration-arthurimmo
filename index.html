@@ -288,6 +288,7 @@
   .pill.annule{ background:var(--neg-soft); color:var(--neg); }
   .type-tag{ font-size:11px; color:var(--ink-3); border:1px solid var(--border); border-radius:5px; padding:1px 6px; margin-left:6px; }
   .empty-row td{ text-align:center; color:var(--ink-3); padding:30px 0; }
+  .group-sep td{ background:var(--surface-2); color:var(--ink-3); font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; padding:7px 14px; border-top:1px solid var(--border); }
 
   /* ---------- drawer ---------- */
   .scrim{ position:fixed; inset:0; background:rgba(20,17,12,.42); backdrop-filter:blur(1px); opacity:0; pointer-events:none; transition:opacity .18s ease; z-index:20; }
@@ -1324,7 +1325,8 @@
       body.innerHTML = '<tr class="empty-row"><td colspan="7">Aucun dossier dans cette vue.</td></tr>';
       return;
     }
-    body.innerHTML = list.map(function(d){
+
+    function rowHtml(d){
       var c = computeDossier(d, autoRates, state.settings);
       var moisLabel = d.dateNotaire ? MOIS_FR_LONG[Number(d.dateNotaire.slice(5,7))-1] + ' ' + d.dateNotaire.slice(0,4) : '—';
       var typeTag = d.type !== 'NORMAL' ? '<span class="type-tag">'+(d.type==='APPORTEUR' ? (d.partenaire||'Apporteur') : 'Prime')+'</span>' : '';
@@ -1340,7 +1342,19 @@
         '<td class="num">'+euro2.format(c.netAPercevoir)+'</td>'+
         '<td class="num" onclick="event.stopPropagation()">'+action+'</td>'+
         '</tr>';
-    }).join('');
+    }
+
+    // Dossiers apporteurs (ex. VousFinancer) affichés à part, en bas du
+    // tableau, pour les distinguer visuellement des dossiers de transaction.
+    var transactions = list.filter(function(d){ return d.type !== 'APPORTEUR'; });
+    var apporteurs = list.filter(function(d){ return d.type === 'APPORTEUR'; });
+
+    var html = transactions.map(rowHtml).join('');
+    if (apporteurs.length){
+      html += '<tr class="group-sep"><td colspan="7">Apporteurs d\'affaire</td></tr>';
+      html += apporteurs.map(rowHtml).join('');
+    }
+    body.innerHTML = html;
 
     body.querySelectorAll('tr[data-id]').forEach(function(tr){
       tr.addEventListener('click', function(){
