@@ -217,6 +217,7 @@
   .card-head{ display:flex; align-items:baseline; justify-content:space-between; gap:10px; margin-bottom:14px; }
   .card-head h2{ font-size:16px; }
   .card-head .hint{ font-size:12px; color:var(--ink-3); }
+  .chart-head-right{ display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
   .legend{ display:flex; gap:14px; font-size:12px; color:var(--ink-2); }
   .legend span{ display:inline-flex; align-items:center; gap:6px; }
   .legend i{ width:9px; height:9px; border-radius:2px; display:inline-block; }
@@ -601,7 +602,13 @@
       <div class="card">
         <div class="card-head">
           <h2>Facturation par mois notaire</h2>
-          <div class="legend" id="chartLegend"></div>
+          <div class="chart-head-right">
+            <div class="field-inline">
+              <label for="compareYearSelect">Comparer à</label>
+              <select id="compareYearSelect"></select>
+            </div>
+            <div class="legend" id="chartLegend"></div>
+          </div>
         </div>
         <div class="chart-wrap">
           <svg class="chart-svg" id="chartSvg" viewBox="0 0 640 260" preserveAspectRatio="xMidYMid meet"></svg>
@@ -934,6 +941,7 @@
     dossiers: [],
     depenses: [],
     year: 2026,
+    compareYear: null, // null = pas encore initialisé ; 'none' = comparaison désactivée ; sinon un millésime (number)
     tab: 'attente',
     search: '',
     editingId: null,
@@ -1019,6 +1027,7 @@
 
     renderStatusRow(all);
     renderKPIs(computed, all);
+    populateCompareYearSelect();
     renderChart(all, autoRates);
     renderGauges(computed);
     renderTable(all, autoRates);
@@ -1148,16 +1157,17 @@
     var settings = state.settings;
     var W = 640, H = 260, padL = 40, padR = 10, padT = 14, padB = 26;
 
-    var prevYear = state.year - 1;
-    var prevAll = state.dossiers.filter(function(d){ return d.dateNotaire && Number(d.dateNotaire.slice(0,4))===prevYear; });
-    var hasPrevYear = prevAll.length > 0;
+    var compareYear = state.compareYear;
+    var hasCompare = compareYear !== 'none' && compareYear !== null;
+    var compareAll = hasCompare ? state.dossiers.filter(function(d){ return d.dateNotaire && Number(d.dateNotaire.slice(0,4))===compareYear; }) : [];
+    var hasCompareData = compareAll.length > 0;
 
     var months = [];
     for (var m=0;m<12;m++){
       var key = state.year + '-' + String(m+1).padStart(2,'0');
-      var prevKey = prevYear + '-' + String(m+1).padStart(2,'0');
+      var prevKey = compareYear + '-' + String(m+1).padStart(2,'0');
       var monthDossiers = includedDossiers(all).filter(function(d){ return monthKey(d.dateNotaire)===key; });
-      var prevMonthDossiers = includedDossiers(prevAll).filter(function(d){ return monthKey(d.dateNotaire)===prevKey; });
+      var prevMonthDossiers = includedDossiers(compareAll).filter(function(d){ return monthKey(d.dateNotaire)===prevKey; });
       var ttc = sum(monthDossiers, function(d){ return Number(d.honoraires)||0; });
       var commission = sum(monthDossiers, function(d){ return computeDossier(d, autoRates, settings).commissionNette; });
       var net = sum(monthDossiers, function(d){ return computeDossier(d, autoRates, settings).netAPercevoir; });
@@ -1176,7 +1186,7 @@
     for (var si=0; si<settings.seuils.length-1; si++){
       seuils.push({ boundary: settings.seuils[si].haut, nextTaux: settings.seuils[si+1].taux });
     }
-    var maxVal = Math.max.apply(null, months.map(function(x){ return Math.max(x.ttc, hasPrevYear?x.prevTtc:0); }).concat([1000]));
+    var maxVal = Math.max.apply(null, months.map(function(x){ return Math.max(x.ttc, hasCompareData?x.prevTtc:0); }).concat([1000]));
     var niceMax = Math.ceil(maxVal/2000)*2000 || 2000;
     var plotW = W - padL - padR, plotH = H - padT - padB;
     var groupW = plotW / 12;
@@ -1184,12 +1194,14 @@
 
     function y(v){ return padT + plotH - (v/niceMax)*plotH; }
 
-    // légende (dynamique : n'affiche l'année précédente que si des données existent)
+    // légende (le comparatif est piloté par le sélecteur « Comparer à » ;
+    // s'il n'y a aucune donnée pour l'année choisie, on le précise plutôt que
+    // de tracer une ligne plate à 0 qui prêterait à confusion)
     var legendHTML =
       '<span><i style="background:var(--chart-2)"></i>Honoraires TTC</span>' +
       '<span><i style="background:var(--chart-1)"></i>Commission nette HT</span>';
-    if (hasPrevYear){
-      legendHTML += '<span><i style="background:none;border-top:2px dashed var(--ink-3);height:0;width:11px;"></i>TTC '+prevYear+'</span>';
+    if (hasCompare){
+      legendHTML += '<span><i style="background:none;border-top:2px dashed var(--ink-3);height:0;width:11px;"></i>TTC '+compareYear+(hasCompareData?'':' (aucune donnée)')+'</span>';
     }
     if (rythme <= niceMax){
       legendHTML += '<span><i style="background:none;border-top:2px dotted var(--neg);height:0;width:11px;"></i>Rythme objectif ('+euro.format(Math.round(rythmeNet))+' net/mois)</span>';
@@ -1221,9 +1233,9 @@
       refLines += '<line x1="'+padL+'" x2="'+(W-padR)+'" y1="'+ry+'" y2="'+ry+'" stroke="var(--neg)" stroke-width="1.4" stroke-dasharray="1 3" stroke-linecap="round" opacity="0.85"></line>';
     }
 
-    // comparaison année précédente (TTC, ligne pointillée)
+    // comparaison avec l'année sélectionnée (TTC, ligne pointillée)
     var prevLine = '';
-    if (hasPrevYear){
+    if (hasCompareData){
       var pts = months.map(function(mo,i){
         var cx = padL + groupW*i + groupW/2;
         return (cx-barW/2-1)+','+y(mo.prevTtc);
@@ -1257,7 +1269,7 @@
       tooltip.style.left = px+'px';
       tooltip.style.top = py+'px';
       var html = '<b>'+MOIS_FR_LONG[i]+' '+state.year+'</b><br>TTC : <b>'+euro.format(mo.ttc)+'</b><br>Commission nette HT : <b>'+euro.format(mo.commission)+'</b><br>Net réel (après URSSAF) : <b>'+euro.format(mo.net)+'</b>';
-      if (hasPrevYear) html += '<br>TTC '+prevYear+' : <b>'+euro.format(mo.prevTtc)+'</b>';
+      if (hasCompareData) html += '<br>TTC '+compareYear+' : <b>'+euro.format(mo.prevTtc)+'</b>';
       tooltip.innerHTML = html;
       tooltip.classList.add('show');
     }
@@ -1429,6 +1441,30 @@
     var current = sel.value;
     sel.innerHTML = list.map(function(y){ return '<option value="'+y+'">'+y+'</option>'; }).join('');
     sel.value = String(state.year);
+  }
+
+  // Liste des années disponibles pour la comparaison sur le graphique (toutes
+  // celles où existent des dossiers, moins l'année affichée, + l'année
+  // précédente même sans données pour pouvoir l'anticiper). Initialise
+  // state.compareYear une seule fois (par défaut : année précédente si elle a
+  // des données, sinon « Aucune comparaison »).
+  function populateCompareYearSelect(){
+    var years = {};
+    state.dossiers.forEach(function(d){ if (d.dateNotaire) years[Number(d.dateNotaire.slice(0,4))] = true; });
+    years[state.year - 1] = true;
+    delete years[state.year];
+    var list = Object.keys(years).map(Number).sort(function(a,b){ return b-a; });
+
+    if (state.compareYear === null){
+      var hasPrev = state.dossiers.some(function(d){ return d.dateNotaire && Number(d.dateNotaire.slice(0,4)) === state.year-1; });
+      state.compareYear = hasPrev ? (state.year-1) : 'none';
+    }
+
+    var sel = document.getElementById('compareYearSelect');
+    sel.innerHTML = list.map(function(y){ return '<option value="'+y+'">'+y+'</option>'; }).join('') +
+      '<option value="none">Aucune comparaison</option>';
+    sel.value = String(state.compareYear);
+    if (sel.value !== String(state.compareYear)){ state.compareYear = 'none'; sel.value = 'none'; }
   }
 
   /* ---------------- drawer / form ---------------- */
@@ -2212,7 +2248,14 @@
     });
 
     document.getElementById('yearSelect').addEventListener('change', function(e){
-      state.year = Number(e.target.value); render();
+      state.year = Number(e.target.value);
+      state.compareYear = null; // redéfinit l'année de comparaison par défaut pour la nouvelle année affichée
+      render();
+    });
+
+    document.getElementById('compareYearSelect').addEventListener('change', function(e){
+      state.compareYear = e.target.value === 'none' ? 'none' : Number(e.target.value);
+      render();
     });
 
     document.getElementById('tabs').addEventListener('click', function(e){
