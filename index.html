@@ -291,6 +291,12 @@
   .pill.attente{ background:var(--warn-soft); color:var(--warn); }
   .pill.annule{ background:var(--neg-soft); color:var(--neg); }
   .type-tag{ font-size:11px; color:var(--ink-3); border:1px solid var(--border); border-radius:5px; padding:1px 6px; margin-left:6px; }
+  table.dossiers tbody tr.row-to-collect td{ background:var(--amber-soft); }
+  table.dossiers tbody tr.row-to-collect:hover td{ filter:brightness(0.96); }
+  .to-collect-tag{
+    font-size:11px; font-weight:700; color:var(--amber); border:1px solid var(--amber); border-radius:5px;
+    padding:1px 6px; margin-left:6px; white-space:nowrap;
+  }
   .empty-row td{ text-align:center; color:var(--ink-3); padding:30px 0; }
   .group-sep td{ background:var(--surface-2); color:var(--ink-3); font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; padding:7px 14px; border-top:1px solid var(--border); }
 
@@ -369,6 +375,16 @@
   .invoice-modal-head{ display:flex; align-items:center; justify-content:space-between; padding:18px 20px; border-bottom:1px solid var(--border); flex-shrink:0; }
   .invoice-modal-head h2{ font-size:17px; }
   .invoice-modal-body{ padding:18px 20px; overflow-y:auto; }
+  .invoice-modal-foot{
+    display:flex; align-items:center; justify-content:flex-end; gap:10px; padding:14px 20px;
+    border-top:1px solid var(--border); flex-shrink:0;
+  }
+  .invoice-modal-foot[hidden]{ display:none; }
+  .invoice-mark-confirm{
+    display:flex; align-items:center; gap:8px; flex-wrap:wrap; justify-content:flex-end; font-size:12.5px;
+    color:var(--ink-2); padding:12px 20px; border-top:1px solid var(--border); background:var(--amber-soft); flex-shrink:0;
+  }
+  .invoice-mark-confirm[hidden]{ display:none; }
   .invoice-hint{ font-size:12.5px; color:var(--ink-3); margin-bottom:14px; }
   .invoice-empty{ font-size:13px; color:var(--ink-3); padding:14px 0; }
   .invoice-bulk-taux{
@@ -849,6 +865,14 @@
     <div class="invoice-select-list" id="invoiceSelectList"></div>
     <div class="invoice-results" id="invoiceResults"></div>
     <div class="invoice-comparison" id="invoiceComparison"></div>
+  </div>
+  <div class="invoice-mark-confirm" id="invoiceMarkConfirm" hidden>
+    <span>Surligner ces dossiers dans le tableau pour penser à cliquer « ✓ Payé » dès que l'argent est reçu&nbsp;?</span>
+    <button type="button" class="btn btn-sm btn-ghost" id="btnMarkInvoicedNo">Non</button>
+    <button type="button" class="btn btn-sm btn-primary" id="btnMarkInvoicedYes">Oui, les surligner</button>
+  </div>
+  <div class="invoice-modal-foot" id="invoiceModalFoot">
+    <button type="button" class="btn btn-sm btn-primary" id="btnMarkInvoiced">✓ J'ai envoyé cette facture</button>
   </div>
 </div>
 
@@ -1370,11 +1394,16 @@
       var c = computeDossier(d, autoRates, state.settings);
       var moisLabel = d.dateNotaire ? MOIS_FR_LONG[Number(d.dateNotaire.slice(5,7))-1] + ' ' + d.dateNotaire.slice(0,4) : '—';
       var typeTag = d.type !== 'NORMAL' ? '<span class="type-tag">'+(d.type==='APPORTEUR' ? (d.partenaire||'Apporteur') : 'Prime')+'</span>' : '';
+      // Surlignage des dossiers facturés via « Préparer facture » et toujours
+      // en attente de paiement — rappel visuel pour cliquer « ✓ Payé » dès
+      // que l'argent est reçu (demandé par Séb le 09/10/2026).
+      var toCollect = d.statut === 'En attente' && !!d.aFacturer;
+      var collectTag = toCollect ? '<span class="to-collect-tag" title="Facture envoyée, en attente d’encaissement">🧾 À encaisser</span>' : '';
       var action = d.statut==='En attente'
         ? '<button class="btn btn-sm mark-paid" data-id="'+d.id+'" title="Marquer comme payé">✓ Payé</button>'
         : '';
-      return '<tr data-id="'+d.id+'">'+
-        '<td>'+escapeHTML(d.nom)+typeTag+'</td>'+
+      return '<tr data-id="'+d.id+'"'+(toCollect ? ' class="row-to-collect"' : '')+'>'+
+        '<td>'+escapeHTML(d.nom)+typeTag+collectTag+'</td>'+
         '<td>'+statusPillHTML(d.statut)+'</td>'+
         '<td>'+moisLabel+'</td>'+
         '<td class="num">'+euroSmart(Number(d.honoraires)||0)+'</td>'+
@@ -1436,6 +1465,7 @@
       var dateVal = document.getElementById('paidDateInput').value || today;
       d.statut = 'Payé';
       d.dateEncaissement = dateVal;
+      d.aFacturer = false; // le surlignage « à encaisser » n'a plus lieu d'être une fois payé
       // l'UI se met à jour d'abord, la synchro réseau ensuite : si la synchro
       // échoue ou lève une erreur, le popover se ferme et le tableau se
       // rafraîchit quand même (persistDossier a son propre filet de sécurité)
@@ -2100,6 +2130,8 @@
         invoiceHelper.selected[d.id] = true;
       }
     });
+    document.getElementById('invoiceMarkConfirm').hidden = true;
+    document.getElementById('invoiceModalFoot').hidden = false;
     document.getElementById('invoiceScrim').classList.add('open');
     document.getElementById('invoiceModal').classList.add('open');
     renderInvoiceSelectList();
@@ -2108,6 +2140,41 @@
   function closeInvoiceHelper(){
     document.getElementById('invoiceScrim').classList.remove('open');
     document.getElementById('invoiceModal').classList.remove('open');
+    document.getElementById('invoiceMarkConfirm').hidden = true;
+    document.getElementById('invoiceModalFoot').hidden = false;
+  }
+
+  // Après avoir préparé la facture, Séb peut valider : les dossiers cochés
+  // sont marqués `aFacturer = true` et apparaissent surlignés (fond ambré +
+  // badge « 🧾 À encaisser ») dans le tableau principal tant qu'ils restent
+  // « En attente », pour qu'il pense à cliquer « ✓ Payé » dès réception de
+  // l'argent. Le flag est retiré automatiquement au clic sur « ✓ Payé ».
+  // Demandé par Séb le 09/10/2026.
+  function askMarkInvoiced(){
+    var ids = selectedInvoiceIds();
+    if (!ids.length){ toast('Coche au moins un dossier à facturer.'); return; }
+    document.getElementById('invoiceModalFoot').hidden = true;
+    document.getElementById('invoiceMarkConfirm').hidden = false;
+  }
+  function cancelMarkInvoiced(){
+    document.getElementById('invoiceMarkConfirm').hidden = true;
+    document.getElementById('invoiceModalFoot').hidden = false;
+  }
+  function confirmMarkInvoiced(){
+    var ids = selectedInvoiceIds();
+    var byId = {};
+    state.dossiers.forEach(function(d){ byId[d.id] = d; });
+    var n = 0;
+    ids.forEach(function(id){
+      var d = byId[id];
+      if (!d) return;
+      d.aFacturer = true;
+      persistDossier(d);
+      n++;
+    });
+    render();
+    toast(n > 1 ? n + ' dossiers surlignés dans le tableau.' : 'Dossier surligné dans le tableau.');
+    closeInvoiceHelper();
   }
 
   /* ---------------- aide fiscale (« Impôts » — URSSAF & TVA) ---------------- */
@@ -2280,6 +2347,9 @@
     document.getElementById('btnCloseInvoice').addEventListener('click', closeInvoiceHelper);
     document.getElementById('invoiceScrim').addEventListener('click', closeInvoiceHelper);
     document.getElementById('btnApplyBulkTaux').addEventListener('click', applyBulkInvoiceTaux);
+    document.getElementById('btnMarkInvoiced').addEventListener('click', askMarkInvoiced);
+    document.getElementById('btnMarkInvoicedNo').addEventListener('click', cancelMarkInvoiced);
+    document.getElementById('btnMarkInvoicedYes').addEventListener('click', confirmMarkInvoiced);
 
     document.getElementById('btnTaxHelperTop').addEventListener('click', openTaxHelper);
     document.getElementById('btnCloseTax').addEventListener('click', closeTaxHelper);
