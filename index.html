@@ -1464,8 +1464,10 @@
   // Liste des années disponibles pour la comparaison sur le graphique (toutes
   // celles où existent des dossiers, moins l'année affichée, + l'année
   // précédente même sans données pour pouvoir l'anticiper). Initialise
-  // state.compareYear une seule fois (par défaut : année précédente si elle a
-  // des données, sinon « Aucune comparaison »).
+  // state.compareYear une seule fois : en priorité avec le dernier choix de
+  // Séb mémorisé dans ce navigateur (localStorage, persiste même après avoir
+  // fermé l'appli), sinon par défaut l'année précédente si elle a des
+  // données, sinon « Aucune comparaison ».
   function populateCompareYearSelect(){
     var years = {};
     state.dossiers.forEach(function(d){ if (d.dateNotaire) years[Number(d.dateNotaire.slice(0,4))] = true; });
@@ -1474,8 +1476,16 @@
     var list = Object.keys(years).map(Number).sort(function(a,b){ return b-a; });
 
     if (state.compareYear === null){
-      var hasPrev = state.dossiers.some(function(d){ return d.dateNotaire && Number(d.dateNotaire.slice(0,4)) === state.year-1; });
-      state.compareYear = hasPrev ? (state.year-1) : 'none';
+      var saved = null;
+      try{ saved = localStorage.getItem('remuneration_compareYear'); }catch(e){}
+      if (saved === 'none'){
+        state.compareYear = 'none';
+      } else if (saved && !isNaN(Number(saved))){
+        state.compareYear = Number(saved);
+      } else {
+        var hasPrev = state.dossiers.some(function(d){ return d.dateNotaire && Number(d.dateNotaire.slice(0,4)) === state.year-1; });
+        state.compareYear = hasPrev ? (state.year-1) : 'none';
+      }
     }
 
     var sel = document.getElementById('compareYearSelect');
@@ -2273,6 +2283,7 @@
 
     document.getElementById('compareYearSelect').addEventListener('change', function(e){
       state.compareYear = e.target.value === 'none' ? 'none' : Number(e.target.value);
+      try{ localStorage.setItem('remuneration_compareYear', String(state.compareYear)); }catch(err){}
       render();
     });
 
