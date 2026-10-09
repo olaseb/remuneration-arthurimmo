@@ -388,6 +388,16 @@
   .invoice-row-meta{ font-size:12px; color:var(--ink-3); flex-shrink:0; }
   .invoice-row-taux{ display:flex; align-items:center; gap:4px; font-size:12.5px; color:var(--ink-2); flex-shrink:0; }
   .invoice-row-taux input{ width:48px; border:1px solid var(--border); background:var(--bg); border-radius:6px; padding:4px 6px; text-align:right; }
+  .invoice-group-sep{
+    font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; color:var(--ink-3);
+    background:var(--surface-2); border-radius:var(--radius-sm); padding:7px 10px; margin:8px 0 2px;
+  }
+  .invoice-row.is-apporteur{ background:var(--amber-soft); }
+  .invoice-row.is-apporteur:hover{ filter:brightness(0.97); }
+  .invoice-row-partner{
+    font-size:10.5px; font-weight:700; color:var(--amber); background:var(--surface); border:1px solid var(--amber);
+    border-radius:999px; padding:1px 7px; flex-shrink:0; white-space:nowrap;
+  }
   .invoice-taux-confirm{
     display:flex; align-items:center; gap:8px; flex-wrap:wrap; font-size:12px; color:var(--ink-2);
     background:var(--amber-soft); border-radius:var(--radius-sm); padding:8px 10px; margin:2px 6px 6px;
@@ -1771,6 +1781,14 @@
     return yearDossiers().filter(function(d){ return d.statut === 'En attente'; });
   }
 
+  // "AAAA-MM" du mois en cours (date réelle du jour), utilisé pour pré-cocher
+  // automatiquement à l'ouverture de l'aide "Préparer facture" les dossiers
+  // dont l'encaissement est attendu ce mois-ci.
+  function currentMonthKey(){
+    var now = new Date();
+    return now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2, '0');
+  }
+
   function invoiceMoisNotaireLabel(d){
     if (!d.dateNotaire) return '—';
     return MOIS_FR_LONG[Number(d.dateNotaire.slice(5,7))-1] + ' ' + d.dateNotaire.slice(0,4);
@@ -1960,13 +1978,22 @@
     var all = yearDossiers();
     var autoRates = monthlyAutoRates(all, state.settings);
 
-    list.innerHTML = eligible.map(function(d){
+    // Les dossiers APPORTEUR (ex. VousFinancer) sont regroupés et distingués
+    // visuellement car ils ne peuvent pas figurer sur la même facture que les
+    // dossiers de transaction classiques (client différent) — demandé par Séb.
+    var transactions = eligible.filter(function(d){ return d.type !== 'APPORTEUR'; });
+    var apporteurs = eligible.filter(function(d){ return d.type === 'APPORTEUR'; });
+
+    function rowHtml(d){
       var pct = invoiceEffectiveTauxPct(d, autoRates);
       var checked = invoiceHelper.selected[d.id] ? 'checked' : '';
+      var isApporteur = d.type === 'APPORTEUR';
+      var partnerBadge = isApporteur ? '<span class="invoice-row-partner">'+escapeHTML(d.partenaire || 'Apporteur')+'</span>' : '';
       return '' +
-        '<div class="invoice-row" data-row-id="'+d.id+'">' +
+        '<div class="invoice-row'+(isApporteur ? ' is-apporteur' : '')+'" data-row-id="'+d.id+'">' +
           '<input type="checkbox" data-invoice-id="'+d.id+'" '+checked+'>' +
           '<span class="invoice-row-name">'+escapeHTML(d.nom)+'</span>' +
+          partnerBadge +
           '<span class="invoice-row-date">'+escapeHTML(invoiceMoisNotaireLabel(d))+'</span>' +
           '<span class="invoice-row-meta">'+euroSmart(Number(d.honoraires)||0)+'</span>' +
           '<span class="invoice-row-taux">' +
@@ -1978,7 +2005,14 @@
           '<button type="button" class="btn btn-sm btn-primary" data-confirm="yes" data-id="'+d.id+'">Oui, mettre à jour</button>' +
           '<button type="button" class="btn btn-sm btn-ghost" data-confirm="no" data-id="'+d.id+'">Non, juste ici</button>' +
         '</div>';
-    }).join('');
+    }
+
+    var html = transactions.map(rowHtml).join('');
+    if (apporteurs.length){
+      html += '<div class="invoice-group-sep">Apporteurs d’affaire — facture séparée (client différent)</div>';
+      html += apporteurs.map(rowHtml).join('');
+    }
+    list.innerHTML = html;
 
     list.querySelectorAll('.invoice-row').forEach(function(row){
       var id = row.getAttribute('data-row-id');
@@ -2057,6 +2091,15 @@
   function openInvoiceHelper(){
     invoiceHelper.selected = {};
     invoiceHelper.tauxOverride = {};
+    // Pré-coche automatiquement les dossiers dont l'encaissement est attendu
+    // ce mois-ci (basé sur dateEncaissement, modifiable ensuite librement) —
+    // demandé par Séb pour ne pas avoir à tout cocher à la main à chaque fois.
+    var curKey = currentMonthKey();
+    invoiceEligibleDossiers().forEach(function(d){
+      if (d.dateEncaissement && d.dateEncaissement.slice(0, 7) === curKey){
+        invoiceHelper.selected[d.id] = true;
+      }
+    });
     document.getElementById('invoiceScrim').classList.add('open');
     document.getElementById('invoiceModal').classList.add('open');
     renderInvoiceSelectList();
