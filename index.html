@@ -1218,11 +1218,15 @@
     }
 
     // rythme objectif : c'est un montant NET mensuel (objectif net annuel / 12).
-    // Il ne peut pas être comparé tel quel aux barres (TTC / commission nette HT) :
-    // il faut le convertir en commission nette HT équivalente (avant URSSAF) pour
-    // qu'il se place au bon niveau sur l'axe des barres vertes.
+    // Les barres du graphique sont en TTC facturé, donc il faut convertir ce
+    // montant net en TTC équivalent — avec le même coefficient net/TTC que le
+    // simulateur "ventes à faire" juste au-dessus (TVA, taux du palier bas,
+    // participation et URSSAF), pas seulement l'URSSAF comme avant (bug signalé
+    // par Séb le 13/10/2026 : la ligne apparaissait beaucoup trop bas, un
+    // dossier largement sous l'objectif net semblait le dépasser sur le graphique).
     var rythmeNet = settings.objectifAnnuel/12;
-    var rythme = rythmeNet / (1 - settings.urssaf);
+    var rythmeCoeff = (1/(1+settings.tva)) * settings.seuils[0].taux * (1-settings.participation) * (1-settings.urssaf);
+    var rythme = rythmeNet / rythmeCoeff;
     // paliers : chaque frontière (17k, 25k) affiche le taux du PALIER SUIVANT (celui qu'on atteint en la dépassant)
     var seuils = [];
     for (var si=0; si<settings.seuils.length-1; si++){
