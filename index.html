@@ -293,6 +293,24 @@
   .type-tag{ font-size:11px; color:var(--ink-3); border:1px solid var(--border); border-radius:5px; padding:1px 6px; margin-left:6px; }
   .contact-tag{ font-size:11px; color:var(--ink-3); margin-left:6px; white-space:nowrap; }
   .contact-tag::before{ content:"👤"; margin-right:3px; font-size:10px; opacity:0.75; }
+  /* ---------- avancement des dossiers apporteurs (Déposé › Accord › Offre) ---------- */
+  .avct{ display:flex; align-items:center; flex-wrap:wrap; gap:0; margin-top:6px; }
+  .avct-step{
+    font:inherit; font-size:11px; line-height:1; padding:4px 9px; border-radius:999px; cursor:pointer;
+    border:1px dashed var(--border); background:transparent; color:var(--ink-3); white-space:nowrap;
+    transition:border-color .15s, color .15s, background .15s;
+  }
+  .avct-step:hover{ border-color:var(--accent); color:var(--accent); border-style:solid; }
+  .avct-step.done{ border:1px solid transparent; color:var(--pos); padding-left:4px; padding-right:4px; }
+  .avct-step.done::before{ content:"✓ "; font-weight:700; }
+  .avct-step.done:hover{ color:var(--accent); }
+  .avct-step.current{ border:1px solid transparent; font-weight:700; cursor:default; }
+  .avct-step.current::before{ content:""; display:inline-block; width:6px; height:6px; border-radius:50%; background:currentColor; margin-right:5px; vertical-align:1px; }
+  .avct-step.current.s-depose{ background:var(--warn-soft); color:var(--warn); }
+  .avct-step.current.s-accord{ background:var(--accent-soft); color:var(--accent); }
+  .avct-step.current.s-offre{ background:var(--pos-soft); color:var(--pos); }
+  .avct-sep{ width:12px; height:1px; background:var(--border); margin:0 3px; flex-shrink:0; }
+  .avct-sep.done{ background:var(--pos); opacity:.6; }
   table.dossiers tbody tr.row-to-collect td{ background:var(--amber-soft); }
   table.dossiers tbody tr.row-to-collect:hover td{ filter:brightness(0.96); }
   .to-collect-tag{
@@ -833,6 +851,14 @@
           <button type="button" class="btn btn-secondary btn-sm" id="btnAddContactInline">Ajouter</button>
           <button type="button" class="btn btn-ghost btn-sm" id="btnCancelContactInline">Annuler</button>
         </div>
+      </div>
+      <div class="form-field full" id="avancementField" style="display:none;">
+        <label for="fAvancement">Avancement du dossier</label>
+        <select id="fAvancement">
+          <option value="depose">Dossier déposé</option>
+          <option value="accord">Accord de prêt</option>
+          <option value="offre">Offre de prêt</option>
+        </select>
       </div>
       <div class="form-field">
         <label for="fStatut">Statut</label>
@@ -1447,7 +1473,7 @@
         ? '<button class="btn btn-sm mark-paid" data-id="'+d.id+'" title="Marquer comme payé">✓ Payé</button>'
         : '';
       return '<tr data-id="'+d.id+'"'+(toCollect ? ' class="row-to-collect"' : '')+'>'+
-        '<td>'+escapeHTML(d.nom)+typeTag+contactTag+collectTag+'</td>'+
+        '<td>'+escapeHTML(d.nom)+typeTag+contactTag+collectTag+(d.type==='APPORTEUR' ? avancementStepperHTML(d) : '')+'</td>'+
         '<td>'+statusPillHTML(d.statut)+'</td>'+
         '<td>'+moisLabel+'</td>'+
         '<td class="num">'+euroSmart(Number(d.honoraires)||0)+'</td>'+
@@ -1481,6 +1507,43 @@
         openPaidPopover(btn.getAttribute('data-id'), btn);
       });
     });
+    body.querySelectorAll('.avct-step').forEach(function(btn){
+      btn.addEventListener('click', function(e){
+        e.stopPropagation(); // ne pas ouvrir le formulaire du dossier
+        setAvancement(btn.getAttribute('data-id'), btn.getAttribute('data-step'));
+      });
+    });
+  }
+
+  /* ---------------- avancement des dossiers apporteurs ---------------- */
+  // Étapes du financement côté partenaire (ex. VousFinancer), dans l'ordre.
+  // Un dossier sans valeur (créé avant cette fonctionnalité) est considéré « déposé ».
+  var AVANCEMENTS = [
+    { key:'depose', label:'Dossier déposé', short:'Déposé' },
+    { key:'accord', label:'Accord de prêt', short:'Accord de prêt' },
+    { key:'offre',  label:'Offre de prêt',  short:'Offre de prêt' }
+  ];
+  function avancementIndex(d){
+    for (var i=0; i<AVANCEMENTS.length; i++){ if (AVANCEMENTS[i].key === d.avancement) return i; }
+    return 0;
+  }
+  function avancementStepperHTML(d){
+    var cur = avancementIndex(d);
+    return '<div class="avct" role="group" aria-label="Avancement du dossier">' + AVANCEMENTS.map(function(s, i){
+      var cls = i < cur ? 'done' : (i === cur ? 'current s-'+s.key : 'todo');
+      var title = i === cur ? 'Étape actuelle : '+s.label : 'Passer à « '+s.label+' »';
+      var sep = i > 0 ? '<span class="avct-sep'+(i <= cur ? ' done' : '')+'"></span>' : '';
+      return sep + '<button type="button" class="avct-step '+cls+'" data-id="'+d.id+'" data-step="'+s.key+'" title="'+title+'"'+(i===cur ? ' aria-current="step"' : '')+'>'+s.short+'</button>';
+    }).join('') + '</div>';
+  }
+  function setAvancement(dossierId, step){
+    var d = state.dossiers.find(function(x){ return x.id===dossierId; });
+    if (!d || (d.avancement || 'depose') === step) return;
+    d.avancement = step;
+    var s = AVANCEMENTS.filter(function(a){ return a.key===step; })[0];
+    render();
+    toast(d.nom + ' → ' + (s ? s.label : step) + '.'); // toast() utilise textContent : pas d'échappement HTML ici
+    persistDossier(d);
   }
 
   /* ---------------- marquer payé (popover date) ---------------- */
@@ -1594,6 +1657,7 @@
     document.getElementById('fDateEncaissement').disabled = !diff;
     document.getElementById('fPartenaire').value = d ? (d.partenaire||'') : '';
     populateContactSelect(d ? (d.contact||'') : '');
+    document.getElementById('fAvancement').value = (d && d.avancement) || 'depose'; // nouveau dossier → « Dossier déposé » par défaut
     var type = d ? d.type : 'NORMAL';
     document.querySelectorAll('#typeGroup input').forEach(function(r){ r.checked = (r.value===type); });
     updateTypeVisibility(type);
@@ -1625,6 +1689,7 @@
   function updateTypeVisibility(type){
     document.getElementById('partenaireField').style.display = (type==='APPORTEUR') ? 'block' : 'none';
     document.getElementById('contactField').style.display = (type==='APPORTEUR') ? 'block' : 'none';
+    document.getElementById('avancementField').style.display = (type==='APPORTEUR') ? 'block' : 'none';
     var partenaireInput = document.getElementById('fPartenaire');
     if (type==='APPORTEUR' && !partenaireInput.value.trim()){ partenaireInput.value = 'VousFinancer'; }
     var tauxSelect = document.getElementById('fTaux');
@@ -1688,6 +1753,7 @@
       type: type,
       partenaire: type==='APPORTEUR' ? document.getElementById('fPartenaire').value.trim() : '',
       contact: (type==='APPORTEUR' && document.getElementById('fContact').value !== '__new__') ? document.getElementById('fContact').value : '',
+      avancement: type==='APPORTEUR' ? document.getElementById('fAvancement').value : '',
       statut: document.getElementById('fStatut').value,
       honoraires: Number(document.getElementById('fHonoraires').value)||0,
       dateNotaire: document.getElementById('fDateNotaire').value,
@@ -1734,6 +1800,8 @@
       var idx = state.dossiers.findIndex(function(x){ return x.id===state.editingId; });
       d.id = state.editingId;
       d.createdAt = state.dossiers[idx].createdAt || dossierCreatedAt(state.dossiers[idx]); // conserve la date d'ajout d'origine
+      // conserve les champs qui ne sont pas dans le formulaire (ex. aFacturer, le surlignage « à encaisser »)
+      d = Object.assign({}, state.dossiers[idx], d);
       state.dossiers[idx] = d;
     } else {
       d.id = uid();
