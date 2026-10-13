@@ -291,6 +291,8 @@
   .pill.attente{ background:var(--warn-soft); color:var(--warn); }
   .pill.annule{ background:var(--neg-soft); color:var(--neg); }
   .type-tag{ font-size:11px; color:var(--ink-3); border:1px solid var(--border); border-radius:5px; padding:1px 6px; margin-left:6px; }
+  .contact-tag{ font-size:11px; color:var(--ink-3); margin-left:6px; white-space:nowrap; }
+  .contact-tag::before{ content:"👤"; margin-right:3px; font-size:10px; opacity:0.75; }
   table.dossiers tbody tr.row-to-collect td{ background:var(--amber-soft); }
   table.dossiers tbody tr.row-to-collect:hover td{ filter:brightness(0.96); }
   .to-collect-tag{
@@ -1435,6 +1437,7 @@
       var c = computeDossier(d, autoRates, state.settings);
       var moisLabel = d.dateNotaire ? MOIS_FR_LONG[Number(d.dateNotaire.slice(5,7))-1] + ' ' + d.dateNotaire.slice(0,4) : '—';
       var typeTag = d.type !== 'NORMAL' ? '<span class="type-tag">'+(d.type==='APPORTEUR' ? (d.partenaire||'Apporteur') : 'Prime')+'</span>' : '';
+      var contactTag = (d.type==='APPORTEUR' && d.contact) ? '<span class="contact-tag">'+escapeHTML(d.contact)+'</span>' : '';
       // Surlignage des dossiers facturés via « Préparer facture » et toujours
       // en attente de paiement — rappel visuel pour cliquer « ✓ Payé » dès
       // que l'argent est reçu (demandé par Séb le 09/10/2026).
@@ -1444,7 +1447,7 @@
         ? '<button class="btn btn-sm mark-paid" data-id="'+d.id+'" title="Marquer comme payé">✓ Payé</button>'
         : '';
       return '<tr data-id="'+d.id+'"'+(toCollect ? ' class="row-to-collect"' : '')+'>'+
-        '<td>'+escapeHTML(d.nom)+typeTag+collectTag+'</td>'+
+        '<td>'+escapeHTML(d.nom)+typeTag+contactTag+collectTag+'</td>'+
         '<td>'+statusPillHTML(d.statut)+'</td>'+
         '<td>'+moisLabel+'</td>'+
         '<td class="num">'+euroSmart(Number(d.honoraires)||0)+'</td>'+
