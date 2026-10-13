@@ -353,6 +353,24 @@
   .tier-row input{ border:1px solid var(--border); background:var(--bg); border-radius:6px; padding:5px 7px; width:100%; text-align:right; }
   .settings-foot{ grid-column:1/-1; display:flex; justify-content:flex-end; gap:10px; padding-top:6px; border-top:1px solid var(--border); }
 
+  /* ---------- contacts apporteurs d'affaire (qui s'occupe du dossier chez le partenaire) ---------- */
+  .contact-chip-list{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; }
+  .contact-chip-list:empty::after{ content:"Aucun contact enregistré pour l'instant."; font-size:12px; color:var(--ink-3); }
+  .contact-chip{
+    display:flex; align-items:center; gap:5px; font-size:12.5px; background:var(--surface-2); border:1px solid var(--border);
+    border-radius:999px; padding:4px 5px 4px 11px;
+  }
+  .contact-chip button{
+    border:none; background:none; color:var(--ink-3); cursor:pointer; font-size:12px; line-height:1; width:18px; height:18px;
+    border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  }
+  .contact-chip button:hover{ color:#fff; background:var(--neg); }
+  .contact-add-row{ display:flex; gap:6px; }
+  .contact-add-row input{ flex:1; min-width:0; border:1px solid var(--border); background:var(--bg); border-radius:6px; padding:6px 8px; font-size:12.5px; }
+  .form-field .inline-add{ display:flex; gap:6px; margin-top:7px; }
+  .form-field .inline-add input{ flex:1; min-width:0; border:1px solid var(--border); background:var(--bg); border-radius:6px; padding:6px 8px; font-size:13px; }
+  .form-field .inline-add[hidden]{ display:none; }
+
   .paid-popover{
     position:absolute; z-index:30; background:var(--surface); border:1px solid var(--border);
     border-radius:var(--radius-md); box-shadow:var(--shadow-lg); padding:12px; width:220px;
@@ -761,6 +779,15 @@
           <div class="tier-row" style="color:var(--ink-3); font-weight:600;"><span>Seuil bas</span><span>Seuil haut</span><span>Taux</span></div>
           <div id="tierRows"></div>
         </div>
+        <div class="settings-group">
+          <h3>Contacts apporteurs d'affaire</h3>
+          <div class="hint">Qui s'occupe de tes dossiers chez les partenaires (ex. VousFinancer). Ajouté ou supprimé immédiatement, sans besoin d'enregistrer.</div>
+          <div class="contact-chip-list" id="contactChipList"></div>
+          <div class="contact-add-row">
+            <input type="text" id="cfgContactNew" placeholder="Nom du nouveau contact">
+            <button type="button" class="btn btn-secondary btn-sm" id="btnAddContactSettings">Ajouter</button>
+          </div>
+        </div>
         <div class="settings-foot">
           <span class="hint" id="settingsSaved" style="align-self:center;"></span>
           <button class="btn btn-primary btn-sm" id="btnSaveSettings">Enregistrer les paramètres</button>
@@ -795,6 +822,15 @@
       <div class="form-field full" id="partenaireField" style="display:none;">
         <label for="fPartenaire">Partenaire / apporteur d'affaire</label>
         <input type="text" id="fPartenaire" placeholder="ex. VousFinancer">
+      </div>
+      <div class="form-field full" id="contactField" style="display:none;">
+        <label for="fContact">Qui s'occupe du dossier chez eux</label>
+        <select id="fContact"></select>
+        <div class="inline-add" id="contactAddRow" hidden>
+          <input type="text" id="fContactNew" placeholder="Nom du nouveau contact">
+          <button type="button" class="btn btn-secondary btn-sm" id="btnAddContactInline">Ajouter</button>
+          <button type="button" class="btn btn-ghost btn-sm" id="btnCancelContactInline">Annuler</button>
+        </div>
       </div>
       <div class="form-field">
         <label for="fStatut">Statut</label>
@@ -923,7 +959,8 @@
       { bas: 0, haut: 16999, taux: 0.53 },
       { bas: 17000, haut: 24999, taux: 0.55 },
       { bas: 25000, haut: 99999999, taux: 0.60 }
-    ]
+    ],
+    contactsApporteur: ["Pierre LEBOSSE", "Nicolas VERGOZ"]
   };
 
   // Données réelles au 26/09/2026, reprises telles quelles depuis la base précédente
@@ -1553,6 +1590,7 @@
     document.getElementById('fDateEncaissement').value = diff ? d.dateEncaissement : (d ? d.dateNotaire : '');
     document.getElementById('fDateEncaissement').disabled = !diff;
     document.getElementById('fPartenaire').value = d ? (d.partenaire||'') : '';
+    populateContactSelect(d ? (d.contact||'') : '');
     var type = d ? d.type : 'NORMAL';
     document.querySelectorAll('#typeGroup input').forEach(function(r){ r.checked = (r.value===type); });
     updateTypeVisibility(type);
@@ -1583,11 +1621,59 @@
 
   function updateTypeVisibility(type){
     document.getElementById('partenaireField').style.display = (type==='APPORTEUR') ? 'block' : 'none';
+    document.getElementById('contactField').style.display = (type==='APPORTEUR') ? 'block' : 'none';
     var partenaireInput = document.getElementById('fPartenaire');
     if (type==='APPORTEUR' && !partenaireInput.value.trim()){ partenaireInput.value = 'VousFinancer'; }
     var tauxSelect = document.getElementById('fTaux');
     if (type !== 'NORMAL' && tauxSelect.value === 'AUTO'){ tauxSelect.value = '1'; }
     document.getElementById('tauxCustomField').style.display = (tauxSelect.value==='custom') ? 'block' : 'none';
+  }
+
+  function populateContactSelect(selected){
+    var sel = document.getElementById('fContact');
+    var contacts = (state.settings.contactsApporteur || []);
+    var html = '<option value="">—</option>';
+    contacts.forEach(function(c){
+      html += '<option value="'+escapeHTML(c)+'">'+escapeHTML(c)+'</option>';
+    });
+    html += '<option value="__new__">+ Ajouter un nouveau contact…</option>';
+    sel.innerHTML = html;
+    document.getElementById('contactAddRow').hidden = true;
+    document.getElementById('fContactNew').value = '';
+    if (selected && contacts.indexOf(selected) > -1){
+      sel.value = selected;
+    } else if (selected) {
+      // contact enregistré sur ce dossier mais supprimé de la liste depuis : on le ré-ajoute temporairement à l'affichage
+      var opt = document.createElement('option');
+      opt.value = selected; opt.textContent = selected + ' (supprimé)';
+      sel.insertBefore(opt, sel.lastElementChild);
+      sel.value = selected;
+    } else {
+      sel.value = '';
+    }
+  }
+
+  function renderContactChips(){
+    var list = document.getElementById('contactChipList');
+    var contacts = (state.settings.contactsApporteur || []);
+    list.innerHTML = contacts.map(function(c, i){
+      return '<span class="contact-chip">'+escapeHTML(c)+'<button type="button" data-idx="'+i+'" title="Supprimer ce contact">✕</button></span>';
+    }).join('');
+  }
+
+  function addContactApporteur(name){
+    if (!state.settings.contactsApporteur) state.settings.contactsApporteur = [];
+    var exists = state.settings.contactsApporteur.some(function(c){ return c.toLowerCase() === name.toLowerCase(); });
+    if (!exists){
+      state.settings.contactsApporteur.push(name);
+      persistSettings();
+    }
+  }
+
+  function removeContactApporteur(idx){
+    if (!state.settings.contactsApporteur) return;
+    state.settings.contactsApporteur.splice(idx, 1);
+    persistSettings();
   }
 
   function readFormDossier(){
@@ -1598,6 +1684,7 @@
       nom: document.getElementById('fNom').value.trim(),
       type: type,
       partenaire: type==='APPORTEUR' ? document.getElementById('fPartenaire').value.trim() : '',
+      contact: (type==='APPORTEUR' && document.getElementById('fContact').value !== '__new__') ? document.getElementById('fContact').value : '',
       statut: document.getElementById('fStatut').value,
       honoraires: Number(document.getElementById('fHonoraires').value)||0,
       dateNotaire: document.getElementById('fDateNotaire').value,
@@ -1773,6 +1860,8 @@
         '<input type="number" data-tier="'+i+'" data-f="taux" value="'+(Math.round(t.taux*10000)/100)+'">'+
         '</div>';
     }).join('');
+    if (!state.settings.contactsApporteur) state.settings.contactsApporteur = DEFAULT_SETTINGS.contactsApporteur.slice();
+    renderContactChips();
   }
 
   function saveSettingsFromForm(){
@@ -2387,9 +2476,46 @@
       if (!e.target.checked){ enc.value = document.getElementById('fDateNotaire').value; }
       updatePreview();
     });
-    ['fNom','fStatut','fHonoraires','fDateNotaire','fDateEncaissement','fTauxCustom','fPartenaire'].forEach(function(id){
+    ['fNom','fStatut','fHonoraires','fDateNotaire','fDateEncaissement','fTauxCustom','fPartenaire','fContact'].forEach(function(id){
       document.getElementById(id).addEventListener('input', updatePreview);
       document.getElementById(id).addEventListener('change', updatePreview);
+    });
+
+    document.getElementById('fContact').addEventListener('change', function(e){
+      var addRow = document.getElementById('contactAddRow');
+      if (e.target.value === '__new__'){
+        addRow.hidden = false;
+        document.getElementById('fContactNew').focus();
+      } else {
+        addRow.hidden = true;
+      }
+    });
+    document.getElementById('btnAddContactInline').addEventListener('click', function(){
+      var name = document.getElementById('fContactNew').value.trim();
+      if (!name) return;
+      addContactApporteur(name);
+      populateContactSelect(name);
+      updatePreview();
+    });
+    document.getElementById('btnCancelContactInline').addEventListener('click', function(){
+      document.getElementById('contactAddRow').hidden = true;
+      document.getElementById('fContact').value = '';
+      updatePreview();
+    });
+    document.getElementById('btnAddContactSettings').addEventListener('click', function(){
+      var input = document.getElementById('cfgContactNew');
+      var name = input.value.trim();
+      if (!name) return;
+      addContactApporteur(name);
+      input.value = '';
+      renderContactChips();
+    });
+    document.getElementById('contactChipList').addEventListener('click', function(e){
+      var btn = e.target.closest('button[data-idx]');
+      if (!btn) return;
+      var idx = Number(btn.getAttribute('data-idx'));
+      removeContactApporteur(idx);
+      renderContactChips();
     });
 
     document.getElementById('yearSelect').addEventListener('change', function(e){
