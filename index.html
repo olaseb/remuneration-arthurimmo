@@ -2416,9 +2416,20 @@
     return p[2] + '/' + p[1] + '/' + p[0];
   }
 
+  // Heure de saisie d'une dépense : champ createdAt (dépenses récentes), sinon
+  // décodée depuis l'id (horodatage base36, comme pour les dossiers).
+  function depenseSaisieAt(d){ return d.createdAt || creationTimeFromId(d.id) || ''; }
+
   function renderTaxExpenses(){
     var el = document.getElementById('taxExpenseList');
-    var list = state.depenses.slice().sort(function(a,b){ return (b.date||'').localeCompare(a.date||''); });
+    // Plus récente en haut : d'abord par date de la dépense, puis — à date égale
+    // (cas courant : plusieurs dépenses saisies le même jour) — par heure de
+    // saisie, pour que la dernière ligne entrée apparaisse tout en haut.
+    var list = state.depenses.slice().sort(function(a,b){
+      var byDate = (b.date||'').localeCompare(a.date||'');
+      if (byDate) return byDate;
+      return depenseSaisieAt(b).localeCompare(depenseSaisieAt(a));
+    });
     if (!list.length){
       el.innerHTML = '<div class="invoice-empty">Aucune dépense enregistrée pour l’instant.</div>';
     } else {
@@ -2462,7 +2473,7 @@
     var taux = Number(document.getElementById('taxExpTaux').value);
     var desc = document.getElementById('taxExpDesc').value.trim();
     var date = document.getElementById('taxExpDate').value || new Date().toISOString().slice(0,10);
-    var d = { id: uid(), description: desc, montantTTC: montant, tauxTva: taux, date: date };
+    var d = { id: uid(), description: desc, montantTTC: montant, tauxTva: taux, date: date, createdAt: new Date().toISOString() };
     state.depenses.push(d);
     renderTaxExpenses();
     persistDepense(d);
