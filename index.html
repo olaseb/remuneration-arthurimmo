@@ -519,6 +519,16 @@
   .tax-net-due .invoice-item-card{ background:var(--amber-soft); }
   .tax-net-credit .invoice-item-card{ background:var(--pos-soft); }
   .tax-net-credit .invoice-item-card h4{ color:var(--pos); }
+  /* total TVA déductible : information prioritaire (à reporter sur la déclaration de TVA) */
+  .tax-ded-main{ margin-top:12px; }
+  .tax-ded-main .invoice-item-card{ background:var(--accent-soft); border:1px solid var(--accent); }
+  .tax-ded-main .invoice-item-card h4{ color:var(--accent); }
+  .tax-ded-main .invoice-field-value > span{ font-size:20px; font-weight:800; color:var(--accent); }
+  /* TVA nette : simple information, plus discrète */
+  .tax-net-info{ margin-top:10px; }
+  .tax-net-info .invoice-item-card{ background:var(--surface-2); padding-top:10px; padding-bottom:10px; }
+  .tax-net-info .invoice-item-card h4{ color:var(--ink-3); }
+  .tax-net-info.is-credit .invoice-item-card h4{ color:var(--pos); }
 
   .toast-stack{ position:fixed; bottom:20px; left:50%; transform:translateX(-50%); z-index:40; display:flex; flex-direction:column; gap:8px; align-items:center; }
   .toast{ background:var(--ink); color:var(--bg); padding:10px 16px; border-radius:999px; font-size:13px; box-shadow:var(--shadow-lg); opacity:0; transform:translateY(6px); transition:all .18s ease; }
@@ -835,8 +845,8 @@
         <label>Type de dossier</label>
         <div class="radio-group" id="typeGroup">
           <label><input type="radio" name="type" value="NORMAL" checked><span>Normal</span></label>
+          <label><input type="radio" name="type" value="APPORTEUR"><span>VousFinancer</span></label>
           <label><input type="radio" name="type" value="PRIME"><span>Prime</span></label>
-          <label><input type="radio" name="type" value="APPORTEUR"><span>Apporteur</span></label>
         </div>
       </div>
       <div class="form-field full" id="partenaireField" style="display:none;">
@@ -2459,10 +2469,16 @@
     var net = Math.round((t.tva - totalDed) * 100) / 100;
     var isCredit = net < 0;
     var netLabel = isCredit ? 'Crédit de TVA (rien à payer ce mois-ci)' : 'TVA nette à déclarer';
+    // Demandé par Séb (17/10/2026) : le total de TVA déductible est l'info à reporter
+    // sur la déclaration de TVA → carte principale, mise en avant et copiable. La TVA
+    // nette (collectée − déductible) reste affichée, mais en simple information.
+    var nb = state.depenses.length;
     el.innerHTML =
-      '<div class="tax-total-line"><span>Total TVA déductible ('+state.depenses.length+' dépense'+(state.depenses.length>1?'s':'')+')</span><span>-'+fixed2Fr(totalDed)+' €</span></div>' +
-      '<div class="'+(isCredit?'tax-net-credit':'tax-net-due')+'">' +
-        invoiceFieldCard(netLabel, [{ label: 'Montant', value: fixed2Fr(Math.abs(net)) }]) +
+      '<div class="tax-ded-main">' +
+        invoiceFieldCard('TVA déductible à déclarer ('+nb+' dépense'+(nb>1?'s':'')+')', [{ label: 'Total TVA déductible', value: fixed2Fr(totalDed) }]) +
+      '</div>' +
+      '<div class="tax-net-info'+(isCredit?' is-credit':'')+'">' +
+        invoiceFieldCard('Pour info — ' + netLabel, [{ label: 'TVA collectée − TVA déductible', value: fixed2Fr(Math.abs(net)) }]) +
       '</div>';
     wireCopyButtons(el);
   }
