@@ -2515,7 +2515,9 @@
     }
     var nbNext = list.filter(function(d){ return (d.date||'') > periodEnd; }).length;
     if (nbNext){
-      el.innerHTML += '<div class="tax-next-note">'+nbNext+' dépense'+(nbNext>1?'s':'')+' datée'+(nbNext>1?'s':'')+' après '+periodLabel(period).toLowerCase()+' : '+(nbNext>1?'elles iront':'elle ira')+' dans la déclaration suivante.</div>';
+      // insertAdjacentHTML (et non innerHTML +=) : innerHTML += reconstruirait toute la liste
+      // et ferait perdre leur action aux boutons ✕ déjà branchés (bug corrigé le 03/11/2026).
+      el.insertAdjacentHTML('beforeend', '<div class="tax-next-note">'+nbNext+' dépense'+(nbNext>1?'s':'')+' datée'+(nbNext>1?'s':'')+' après '+periodLabel(period).toLowerCase()+' : '+(nbNext>1?'elles iront':'elle ira')+' dans la déclaration suivante.</div>');
     }
     renderTaxTotals();
     renderTaxClose();
