@@ -512,6 +512,36 @@
     border-radius:6px; flex-shrink:0; line-height:1.6;
   }
   .tax-expense-delete:hover{ background:var(--neg-soft); color:var(--neg); }
+  .tax-expense-row.is-next{ opacity:.55; }
+  .tax-next-tag{ font-size:10.5px; color:var(--ink-3); border:1px dashed var(--border); border-radius:999px; padding:1px 7px; flex-shrink:0; }
+  .tax-next-note{ font-size:12px; color:var(--ink-3); margin:-4px 4px 8px; }
+  /* ---------- clôture de la déclaration mensuelle + historique ---------- */
+  .tax-close{ margin-top:16px; padding-top:14px; border-top:1px solid var(--border); }
+  .tax-close-row{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .tax-close-row label{ font-size:12.5px; color:var(--ink-2); }
+  .tax-close-row select{ border:1px solid var(--border); background:var(--bg); border-radius:6px; padding:7px 9px; font-size:13px; color:var(--ink); }
+  .tax-close-row .btn{ margin-left:auto; }
+  .tax-close-hint{ font-size:12px; color:var(--ink-3); margin-top:6px; }
+  .tax-confirm{ margin-top:10px; background:var(--amber-soft); border:1px solid var(--amber); border-radius:var(--radius-md); padding:10px 12px; font-size:13px; color:var(--ink); }
+  .tax-confirm.danger{ background:var(--neg-soft); border-color:var(--neg); }
+  .tax-confirm-actions{ display:flex; justify-content:flex-end; gap:8px; margin-top:8px; }
+  .btn-danger{ background:var(--neg); color:#fff; border-color:var(--neg); }
+  .tax-history{ margin-top:16px; }
+  .tax-history > details > summary{ cursor:pointer; font-size:12px; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-3); font-weight:700; padding:8px 0; list-style:none; }
+  .tax-history > details > summary::-webkit-details-marker{ display:none; }
+  .tax-history > details > summary::before{ content:"▸ "; }
+  .tax-history > details[open] > summary::before{ content:"▾ "; }
+  .tax-hist-year{ display:flex; align-items:center; gap:8px; font-weight:700; font-size:13px; padding:8px 4px 4px; border-bottom:1px solid var(--border); }
+  .tax-hist-year .tax-hist-sum{ margin-left:auto; font-weight:500; color:var(--ink-3); font-size:12px; }
+  .tax-hist-row{ display:flex; align-items:center; gap:8px; padding:7px 4px; font-size:12.5px; border-bottom:1px solid var(--border); }
+  .tax-hist-month{ font-weight:600; width:110px; flex-shrink:0; }
+  .tax-hist-info{ flex:1; min-width:0; color:var(--ink-2); }
+  .tax-hist-info small{ display:block; color:var(--ink-3); font-size:11px; }
+  .tax-hist-row .btn{ padding:3px 9px; font-size:12px; }
+  .tax-hist-detail{ padding:4px 0 8px 26px; }
+  .tax-hist-detail .tax-expense-row{ padding:4px 6px; font-size:12px; }
+  .tax-hist-foot{ display:flex; justify-content:flex-end; margin-top:10px; }
+  .tax-hist-empty{ font-size:12.5px; color:var(--ink-3); padding:6px 2px; }
   .tax-total-line{
     display:flex; align-items:center; justify-content:space-between; font-size:13px; color:var(--ink-2);
     padding:10px 2px; border-top:1px solid var(--border);
@@ -977,6 +1007,8 @@
     </div>
     <div class="tax-expense-list" id="taxExpenseList"></div>
     <div class="tax-totals" id="taxTotals"></div>
+    <div class="tax-close" id="taxClose"></div>
+    <div class="tax-history" id="taxHistory"></div>
   </div>
 </div>
 
@@ -1055,6 +1087,7 @@
     settings: JSON.parse(JSON.stringify(DEFAULT_SETTINGS)),
     dossiers: [],
     depenses: [],
+    declarations: [], // déclarations de TVA mensuelles clôturées (collection « declarations »)
     year: 2026,
     compareYear: null, // null = pas encore initialisé ; 'none' = comparaison désactivée ; sinon un millésime (number)
     tab: 'attente',
@@ -1888,11 +1921,24 @@
       }
     }catch(e){ saveLocal(); }
   }
+  function persistDeclaration(dec){
+    try{
+      if (state.db){ state.db.collection('declarations').doc(dec.id).set(dec).catch(function(){ saveLocal(); }); }
+      else { saveLocal(); }
+    }catch(e){ saveLocal(); }
+  }
+  function persistDeclarationDelete(id){
+    try{
+      if (state.db){ state.db.collection('declarations').doc(id).delete().catch(function(){ saveLocal(); }); }
+      else { saveLocal(); }
+    }catch(e){ saveLocal(); }
+  }
   function saveLocal(){
     try{
       localStorage.setItem('remuneration_dossiers', JSON.stringify(state.dossiers));
       localStorage.setItem('remuneration_settings', JSON.stringify(state.settings));
       localStorage.setItem('remuneration_depenses', JSON.stringify(state.depenses));
+      localStorage.setItem('remuneration_declarations', JSON.stringify(state.declarations));
     }catch(e){}
   }
   function loadLocal(){
@@ -1903,6 +1949,8 @@
       if (dd) state.dossiers = JSON.parse(dd);
       if (ss) state.settings = JSON.parse(ss);
       if (pp) state.depenses = JSON.parse(pp);
+      var dc = localStorage.getItem('remuneration_declarations');
+      if (dc) state.declarations = JSON.parse(dc);
     }catch(e){}
   }
 
@@ -2438,19 +2486,23 @@
     // Plus récente en haut : d'abord par date de la dépense, puis — à date égale
     // (cas courant : plusieurs dépenses saisies le même jour) — par heure de
     // saisie, pour que la dernière ligne entrée apparaisse tout en haut.
-    var list = state.depenses.slice().sort(function(a,b){
+    var period = currentTaxPeriod();
+    var periodEnd = periodEndIso(period);
+    var list = openDepenses().sort(function(a,b){
       var byDate = (b.date||'').localeCompare(a.date||'');
       if (byDate) return byDate;
       return depenseSaisieAt(b).localeCompare(depenseSaisieAt(a));
     });
     if (!list.length){
-      el.innerHTML = '<div class="invoice-empty">Aucune dépense enregistrée pour l’instant.</div>';
+      el.innerHTML = '<div class="invoice-empty">Aucune dépense en cours. Les dépenses des mois déjà déclarés sont dans l’historique, plus bas.</div>';
     } else {
       el.innerHTML = list.map(function(d){
         var ded = depenseDeduction(d);
-        return '<div class="tax-expense-row">' +
+        var isNext = (d.date||'') > periodEnd; // datée après le mois à déclarer → prochaine déclaration
+        return '<div class="tax-expense-row'+(isNext?' is-next':'')+'">' +
           '<span class="tax-expense-date">'+formatDateFr(d.date)+'</span>' +
           '<span class="tax-expense-desc">'+escapeHTML(d.description || '—')+'</span>' +
+          (isNext ? '<span class="tax-next-tag" title="Ira dans la déclaration suivante">mois suivant</span>' : '') +
           '<span class="tax-expense-amount">'+rawFr(d.montantTTC)+' € TTC</span>' +
           '<span class="tax-expense-taux">'+rawFr(Number(d.tauxTva))+' %</span>' +
           '<span class="tax-expense-ded">-'+fixed2Fr(ded)+' €</span>' +
@@ -2461,12 +2513,20 @@
         btn.addEventListener('click', function(){ deleteDepense(btn.getAttribute('data-delete-id')); });
       });
     }
+    var nbNext = list.filter(function(d){ return (d.date||'') > periodEnd; }).length;
+    if (nbNext){
+      el.innerHTML += '<div class="tax-next-note">'+nbNext+' dépense'+(nbNext>1?'s':'')+' datée'+(nbNext>1?'s':'')+' après '+periodLabel(period).toLowerCase()+' : '+(nbNext>1?'elles iront':'elle ira')+' dans la déclaration suivante.</div>';
+    }
     renderTaxTotals();
+    renderTaxClose();
+    renderTaxHistory();
   }
 
   function renderTaxTotals(){
     var el = document.getElementById('taxTotals');
-    var totalDed = state.depenses.reduce(function(sum, d){ return sum + depenseDeduction(d); }, 0);
+    var period = currentTaxPeriod();
+    var periodDeps = depensesForPeriod(period);
+    var totalDed = periodDeps.reduce(function(sum, d){ return sum + depenseDeduction(d); }, 0);
     totalDed = Math.round(totalDed * 100) / 100;
     var t = taxSelectionTotals();
     // Demandé par Séb (17/10/2026) : le total de TVA déductible est l'info à reporter
@@ -2476,7 +2536,7 @@
     // La TVA nette est une simple information de contrôle (pas de bouton Copier),
     // calculée comme sur le formulaire de déclaration : base HT arrondie à l'euro ×
     // taux de TVA, arrondi à l'euro, moins la TVA déductible arrondie à l'euro.
-    var nb = state.depenses.length;
+    var nb = periodDeps.length;
     var dedEuro = Math.round(totalDed);
     var baseHTEuro = Math.round(t.totalHT);
     var tvaBruteEuro = Math.round(baseHTEuro * state.settings.tva);
@@ -2485,7 +2545,7 @@
     var tauxTxt = String(Math.round(state.settings.tva*10000)/100).replace('.', ',');
     el.innerHTML =
       '<div class="tax-ded-main">' +
-        invoiceFieldCard('TVA déductible à déclarer ('+nb+' dépense'+(nb>1?'s':'')+')', [{ label: 'Montant à reporter (arrondi à l\'euro)', value: String(dedEuro) }]) +
+        invoiceFieldCard('TVA déductible à déclarer — '+periodLabel(period)+' ('+nb+' dépense'+(nb>1?'s':'')+')', [{ label: 'Montant à reporter (arrondi à l\'euro)', value: String(dedEuro) }]) +
         '<div class="tax-ded-exact">Total exact : '+fixed2Fr(totalDed)+' € → arrondi à l\'euro le plus proche : <strong>'+dedEuro+' €</strong></div>' +
       '</div>' +
       '<div class="tax-net-info'+(netIsCredit?' is-credit':'')+'">' +
@@ -2494,6 +2554,208 @@
         '<div class="tax-net-detail">Base HT '+formatThousands(baseHTEuro)+' € × '+tauxTxt+' % = '+formatThousands(tvaBruteEuro)+' € de TVA collectée − '+formatThousands(dedEuro)+' € de TVA déductible</div>' +
       '</div>';
     wireCopyButtons(el);
+  }
+
+  /* ---------------- déclarations de TVA mensuelles (clôture + historique) ----------------
+     Demandé par Séb le 03/11/2026 : une fois la déclaration de TVA faite, il clôture le
+     mois. Les dépenses datées jusqu'à la fin du mois choisi reçoivent d.declaration =
+     'AAAA-MM' et passent dans l'historique ; le compteur repart à zéro. Les dépenses
+     datées après restent en cours (déclaration suivante). Historique groupé par année,
+     avec « Rouvrir » (erreur de clôture) et suppression par mois ou par année entière. */
+  var taxUi = { period:null, confirmClose:false, histOpen:false, expanded:{}, selected:{}, confirmDelete:false };
+
+  function openDepenses(){ return state.depenses.filter(function(d){ return !d.declaration; }); }
+  function monthKeyOf(date){ var d = date || new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'); }
+  function prevMonthKey(key){ var y=+key.slice(0,4), m=+key.slice(5,7)-1; if (m<1){ m=12; y--; } return y+'-'+String(m).padStart(2,'0'); }
+  function periodEndIso(key){ var y=+key.slice(0,4), m=+key.slice(5,7); var last=new Date(y, m, 0).getDate(); return key+'-'+String(last).padStart(2,'0'); }
+  function periodLabel(key){ var l = MOIS_FR_LONG[+key.slice(5,7)-1]; return l.charAt(0).toUpperCase()+l.slice(1)+' '+key.slice(0,4); }
+  function declarationKeys(){
+    var keys = {};
+    state.declarations.forEach(function(x){ keys[x.id]=true; });
+    state.depenses.forEach(function(d){ if (d.declaration) keys[d.declaration]=true; });
+    return Object.keys(keys).sort().reverse();
+  }
+  function isDeclared(key){ return declarationKeys().indexOf(key) > -1; }
+  // Mois proposés : du plus ancien mois ayant une dépense en cours jusqu'au mois actuel.
+  function taxPeriodOptions(){
+    var cur = monthKeyOf(new Date());
+    var min = prevMonthKey(cur);
+    openDepenses().forEach(function(d){ if (d.date && d.date.slice(0,7) < min) min = d.date.slice(0,7); });
+    var out = [], k = cur;
+    while (k >= min){ out.push(k); k = prevMonthKey(k); }
+    return out;
+  }
+  // Par défaut : le mois précédent (déclaration mensuelle faite début de mois suivant),
+  // sauf s'il est déjà clôturé et qu'il ne reste rien à y déclarer.
+  function currentTaxPeriod(){
+    var opts = taxPeriodOptions();
+    if (taxUi.period && opts.indexOf(taxUi.period) > -1) return taxUi.period;
+    var prev = prevMonthKey(monthKeyOf(new Date()));
+    if (isDeclared(prev) && !depensesForPeriod(prev).length) return monthKeyOf(new Date());
+    return prev;
+  }
+  function depensesForPeriod(key){
+    var end = periodEndIso(key);
+    return openDepenses().filter(function(d){ return (d.date||'') <= end; });
+  }
+  function declarationStats(key){
+    var deps = state.depenses.filter(function(d){ return d.declaration === key; });
+    var doc = state.declarations.filter(function(x){ return x.id === key; })[0] || null;
+    var exact = Math.round(deps.reduce(function(s,d){ return s + depenseDeduction(d); }, 0) * 100) / 100;
+    if (!deps.length && doc){ exact = doc.totalExact || 0; }
+    return { key:key, deps:deps, doc:doc, nb: deps.length || (doc ? doc.nbDepenses||0 : 0), exact: exact, euro: Math.round(exact) };
+  }
+
+  function renderTaxClose(){
+    var el = document.getElementById('taxClose');
+    var period = currentTaxPeriod();
+    var deps = depensesForPeriod(period);
+    var exact = Math.round(deps.reduce(function(s,d){ return s + depenseDeduction(d); }, 0) * 100) / 100;
+    var already = isDeclared(period);
+    var opts = taxPeriodOptions().map(function(k){
+      return '<option value="'+k+'"'+(k===period?' selected':'')+'>'+periodLabel(k)+(isDeclared(k)?' (déjà clôturé)':'')+'</option>';
+    }).join('');
+    var html =
+      '<div class="tax-close-row">' +
+        '<label for="taxPeriodSelect">Déclaration du mois</label>' +
+        '<select id="taxPeriodSelect">'+opts+'</select>' +
+        '<button type="button" class="btn btn-primary btn-sm" id="btnCloseDecl"'+(deps.length?'':' disabled')+'>✓ Déclaration faite — clôturer</button>' +
+      '</div>' +
+      '<div class="tax-close-hint">' + (deps.length
+        ? 'Une fois ta déclaration de TVA envoyée, clôture le mois : ses dépenses passent dans l’historique et le compteur repart à zéro.'
+        : 'Aucune dépense à déclarer pour '+periodLabel(period).toLowerCase()+'.') +
+        (already && deps.length ? ' Ce mois est déjà clôturé : ces dépenses (saisies après coup) y seront ajoutées.' : '') +
+      '</div>';
+    if (taxUi.confirmClose && deps.length){
+      html += '<div class="tax-confirm">Clôturer <strong>'+periodLabel(period)+'</strong> ? Les '+deps.length+' dépense'+(deps.length>1?'s':'')+
+        ' datée'+(deps.length>1?'s':'')+' jusqu’au '+formatDateFr(periodEndIso(period))+' (<strong>'+Math.round(exact)+' €</strong> de TVA déduite, exact '+fixed2Fr(exact)+' €) passent dans l’historique.' +
+        '<div class="tax-confirm-actions"><button type="button" class="btn btn-sm" id="btnCloseDeclNo">Non</button>' +
+        '<button type="button" class="btn btn-sm btn-primary" id="btnCloseDeclYes">Oui, clôturer</button></div></div>';
+    }
+    el.innerHTML = html;
+    document.getElementById('taxPeriodSelect').addEventListener('change', function(e){
+      taxUi.period = e.target.value; taxUi.confirmClose = false; renderTaxExpenses();
+    });
+    document.getElementById('btnCloseDecl').addEventListener('click', function(){ taxUi.confirmClose = true; renderTaxClose(); });
+    if (document.getElementById('btnCloseDeclNo')){
+      document.getElementById('btnCloseDeclNo').addEventListener('click', function(){ taxUi.confirmClose = false; renderTaxClose(); });
+      document.getElementById('btnCloseDeclYes').addEventListener('click', function(){ closeDeclaration(period); });
+    }
+  }
+
+  function closeDeclaration(key){
+    var deps = depensesForPeriod(key);
+    if (!deps.length) return;
+    var now = new Date().toISOString();
+    deps.forEach(function(d){ d.declaration = key; d.declareLe = now; persistDepense(d); });
+    var st = declarationStats(key);
+    var prev = state.declarations.filter(function(x){ return x.id === key; })[0];
+    var dec = { id:key, periode:key, label:periodLabel(key), closedAt: prev ? prev.closedAt : now, updatedAt: now,
+                nbDepenses: st.deps.length, totalExact: st.exact, totalArrondi: st.euro };
+    state.declarations = state.declarations.filter(function(x){ return x.id !== key; }).concat([dec]);
+    persistDeclaration(dec);
+    taxUi.confirmClose = false; taxUi.period = null;
+    toast(periodLabel(key)+' clôturé : '+st.euro+' € de TVA déduite ✓');
+    renderTaxExpenses();
+  }
+
+  function reopenDeclaration(key){
+    state.depenses.forEach(function(d){
+      if (d.declaration === key){ delete d.declaration; delete d.declareLe; persistDepense(d); }
+    });
+    state.declarations = state.declarations.filter(function(x){ return x.id !== key; });
+    persistDeclarationDelete(key);
+    delete taxUi.selected[key];
+    taxUi.period = key;
+    toast(periodLabel(key)+' rouvert : ses dépenses sont revenues dans le compteur.');
+    renderTaxExpenses();
+  }
+
+  function deleteSelectedDeclarations(){
+    var keys = Object.keys(taxUi.selected).filter(function(k){ return taxUi.selected[k]; });
+    var nbDeps = 0;
+    keys.forEach(function(key){
+      state.depenses.filter(function(d){ return d.declaration === key; }).forEach(function(d){ persistDepenseDelete(d.id); nbDeps++; });
+      state.depenses = state.depenses.filter(function(d){ return d.declaration !== key; });
+      state.declarations = state.declarations.filter(function(x){ return x.id !== key; });
+      persistDeclarationDelete(key);
+    });
+    taxUi.selected = {}; taxUi.confirmDelete = false;
+    toast(keys.length+' mois supprimé'+(keys.length>1?'s':'')+' ('+nbDeps+' dépense'+(nbDeps>1?'s':'')+').');
+    renderTaxExpenses();
+  }
+
+  function renderTaxHistory(){
+    var el = document.getElementById('taxHistory');
+    var keys = declarationKeys();
+    // on oublie les sélections de mois qui n'existent plus
+    Object.keys(taxUi.selected).forEach(function(k){ if (keys.indexOf(k)===-1) delete taxUi.selected[k]; });
+    var byYear = {};
+    keys.forEach(function(k){ (byYear[k.slice(0,4)] = byYear[k.slice(0,4)] || []).push(k); });
+    var years = Object.keys(byYear).sort().reverse();
+    var body = '';
+    if (!keys.length){
+      body = '<div class="tax-hist-empty">Aucune déclaration clôturée pour l’instant.</div>';
+    } else {
+      years.forEach(function(y){
+        var ks = byYear[y];
+        var nbSel = ks.filter(function(k){ return taxUi.selected[k]; }).length;
+        var sumY = ks.reduce(function(s,k){ return s + declarationStats(k).euro; }, 0);
+        body += '<div class="tax-hist-year"><input type="checkbox" class="tax-year-cb" data-year="'+y+'"'+(nbSel===ks.length?' checked':'')+' title="Sélectionner toute l’année '+y+'">' +
+          '<span>'+y+'</span><span class="tax-hist-sum">'+ks.length+' mois · '+formatThousands(sumY)+' € de TVA déduite</span></div>';
+        ks.forEach(function(k){
+          var st = declarationStats(k);
+          var closed = st.doc && st.doc.closedAt ? formatDateFr(st.doc.closedAt.slice(0,10)) : '—';
+          body += '<div class="tax-hist-row"><input type="checkbox" class="tax-month-cb" data-key="'+k+'"'+(taxUi.selected[k]?' checked':'')+'>' +
+            '<span class="tax-hist-month">'+periodLabel(k)+'</span>' +
+            '<span class="tax-hist-info">'+st.nb+' dépense'+(st.nb>1?'s':'')+' · <strong>'+st.euro+' €</strong> déduits (exact '+fixed2Fr(st.exact)+' €)<small>clôturé le '+closed+'</small></span>' +
+            '<button type="button" class="btn btn-ghost btn-sm tax-hist-toggle" data-key="'+k+'">'+(taxUi.expanded[k]?'Masquer':'Voir')+'</button>' +
+            '<button type="button" class="btn btn-ghost btn-sm tax-hist-reopen" data-key="'+k+'" title="Remettre ces dépenses dans le compteur en cours">Rouvrir</button></div>';
+          if (taxUi.expanded[k]){
+            var deps = st.deps.slice().sort(function(a,b){ return (b.date||'').localeCompare(a.date||''); });
+            body += '<div class="tax-hist-detail">' + (deps.length ? deps.map(function(d){
+              return '<div class="tax-expense-row"><span class="tax-expense-date">'+formatDateFr(d.date)+'</span>' +
+                '<span class="tax-expense-desc">'+escapeHTML(d.description || '—')+'</span>' +
+                '<span class="tax-expense-amount">'+rawFr(d.montantTTC)+' € TTC</span>' +
+                '<span class="tax-expense-taux">'+rawFr(Number(d.tauxTva))+' %</span>' +
+                '<span class="tax-expense-ded">-'+fixed2Fr(depenseDeduction(d))+' €</span></div>';
+            }).join('') : '<div class="tax-hist-empty">Détail indisponible.</div>') + '</div>';
+          }
+        });
+      });
+      var sel = Object.keys(taxUi.selected).filter(function(k){ return taxUi.selected[k]; });
+      body += '<div class="tax-hist-foot"><button type="button" class="btn btn-sm btn-ghost" id="btnDeleteDecl"'+(sel.length?'':' disabled')+'>🗑 Supprimer la sélection'+(sel.length?' ('+sel.length+' mois)':'')+'</button></div>';
+      if (taxUi.confirmDelete && sel.length){
+        var nbD = state.depenses.filter(function(d){ return sel.indexOf(d.declaration) > -1; }).length;
+        body += '<div class="tax-confirm danger">Supprimer définitivement <strong>'+sel.length+' mois</strong> ('+sel.sort().map(periodLabel).join(', ')+') et leurs <strong>'+nbD+' dépense'+(nbD>1?'s':'')+'</strong> ? C’est irréversible.' +
+          '<div class="tax-confirm-actions"><button type="button" class="btn btn-sm" id="btnDeleteDeclNo">Annuler</button>' +
+          '<button type="button" class="btn btn-sm btn-danger" id="btnDeleteDeclYes">Oui, supprimer</button></div></div>';
+      }
+    }
+    el.innerHTML = '<details'+(taxUi.histOpen?' open':'')+'><summary>Historique des déclarations ('+keys.length+')</summary>'+body+'</details>';
+    var det = el.querySelector('details');
+    det.addEventListener('toggle', function(){ taxUi.histOpen = det.open; });
+    el.querySelectorAll('.tax-year-cb').forEach(function(cb){
+      var ks = byYear[cb.getAttribute('data-year')];
+      var nbSel = ks.filter(function(k){ return taxUi.selected[k]; }).length;
+      cb.indeterminate = nbSel > 0 && nbSel < ks.length;
+      cb.addEventListener('change', function(){ ks.forEach(function(k){ taxUi.selected[k] = cb.checked; }); taxUi.confirmDelete = false; renderTaxHistory(); });
+    });
+    el.querySelectorAll('.tax-month-cb').forEach(function(cb){
+      cb.addEventListener('change', function(){ taxUi.selected[cb.getAttribute('data-key')] = cb.checked; taxUi.confirmDelete = false; renderTaxHistory(); });
+    });
+    el.querySelectorAll('.tax-hist-toggle').forEach(function(b){
+      b.addEventListener('click', function(){ var k=b.getAttribute('data-key'); taxUi.expanded[k] = !taxUi.expanded[k]; renderTaxHistory(); });
+    });
+    el.querySelectorAll('.tax-hist-reopen').forEach(function(b){
+      b.addEventListener('click', function(){ reopenDeclaration(b.getAttribute('data-key')); });
+    });
+    var bd = document.getElementById('btnDeleteDecl');
+    if (bd) bd.addEventListener('click', function(){ taxUi.confirmDelete = true; renderTaxHistory(); });
+    if (document.getElementById('btnDeleteDeclNo')){
+      document.getElementById('btnDeleteDeclNo').addEventListener('click', function(){ taxUi.confirmDelete = false; renderTaxHistory(); });
+      document.getElementById('btnDeleteDeclYes').addEventListener('click', deleteSelectedDeclarations);
+    }
   }
 
   function addDepense(){
@@ -2523,6 +2785,7 @@
     document.getElementById('taxScrim').classList.add('open');
     document.getElementById('taxModal').classList.add('open');
     document.getElementById('taxExpDate').value = new Date().toISOString().slice(0,10);
+    taxUi.period = null; taxUi.confirmClose = false; taxUi.confirmDelete = false;
     renderTaxSelectionSummary();
     renderTaxExpenses();
   }
@@ -2710,7 +2973,7 @@
 
   firebase.initializeApp(firebaseConfig);
   var auth = firebase.auth();
-  var unsubDossiers = null, unsubSettings = null, unsubDepenses = null;
+  var unsubDossiers = null, unsubSettings = null, unsubDepenses = null, unsubDeclarations = null;
 
   function showLogin(msg){
     document.getElementById('appRoot').classList.remove('ready');
@@ -2728,6 +2991,7 @@
     if (unsubDossiers){ unsubDossiers(); unsubDossiers = null; }
     if (unsubSettings){ unsubSettings(); unsubSettings = null; }
     if (unsubDepenses){ unsubDepenses(); unsubDepenses = null; }
+    if (unsubDeclarations){ unsubDeclarations(); unsubDeclarations = null; }
   }
 
   function wireAuthUI(){
@@ -2766,6 +3030,8 @@
       if (depensesSnap.size){
         state.depenses = depensesSnap.docs.map(function(doc){ return doc.data(); });
       }
+      var declSnap = await state.db.collection('declarations').get();
+      state.declarations = declSnap.docs.map(function(doc){ return doc.data(); });
       seedIfEmpty();
       fillSettingsForm();
       render();
@@ -2786,6 +3052,12 @@
 
       unsubDepenses = state.db.collection('depenses').onSnapshot(function(snap){
         state.depenses = snap.docs.map(function(doc){ return doc.data(); });
+        var taxModal = document.getElementById('taxModal');
+        if (taxModal && taxModal.classList.contains('open')) renderTaxExpenses();
+      }, function(){});
+
+      unsubDeclarations = state.db.collection('declarations').onSnapshot(function(snap){
+        state.declarations = snap.docs.map(function(doc){ return doc.data(); });
         var taxModal = document.getElementById('taxModal');
         if (taxModal && taxModal.classList.contains('open')) renderTaxExpenses();
       }, function(){});
