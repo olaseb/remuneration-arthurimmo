@@ -247,6 +247,15 @@
   .gauge-top{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:8px; }
   .gauge-top .t{ font-size:13px; font-weight:600; }
   .gauge-top .v{ font-family:var(--font-display); font-size:18px; font-weight:700; }
+  /* objectif net annuel modifiable directement sur la carte (demandé par Séb le 04/11/2026) */
+  .obj-edit-trigger{ display:inline-flex; align-items:baseline; gap:6px; border:none; background:none; color:inherit; font:inherit; cursor:pointer; padding:2px 6px; margin:-2px -6px; border-radius:var(--radius-sm); }
+  .obj-edit-trigger:hover{ background:var(--surface-2); }
+  .obj-pencil{ font-size:13px; color:var(--ink-3); }
+  .obj-edit-trigger:hover .obj-pencil{ color:var(--accent); }
+  .obj-edit{ display:flex; flex-wrap:wrap; align-items:center; gap:10px; background:var(--surface-2); border-radius:var(--radius-md); padding:10px 12px; margin:0 0 10px; font-size:13px; color:var(--ink-2); }
+  .obj-edit[hidden]{ display:none; }
+  .obj-edit input{ width:90px; border:1px solid var(--border); background:var(--bg); border-radius:6px; padding:6px 8px; font-size:13px; text-align:right; color:var(--ink); }
+  .obj-edit-actions{ display:flex; gap:8px; margin-left:auto; }
   .bar-track{ height:10px; border-radius:999px; background:var(--surface-2); overflow:hidden; position:relative; }
   .bar-fill{ height:100%; border-radius:999px; background:var(--accent); transition:width .5s cubic-bezier(.2,.8,.2,1); }
   .bar-fill.pos{ background:var(--pos); }
@@ -729,8 +738,17 @@
 
       <div class="card">
         <div class="gauge-block">
-          <div class="gauge-top"><span class="t">Objectif net annuel</span><span class="v" id="objTarget"></span></div>
+          <div class="gauge-top"><span class="t">Objectif net annuel</span>
+            <button type="button" class="obj-edit-trigger" id="objEditBtn" title="Modifier l'objectif"><span class="v" id="objTarget"></span><span class="obj-pencil" aria-hidden="true">✎</span></button></div>
           <div class="hint" id="objTargetMensuel" style="margin:-4px 0 8px;"></div>
+          <div class="obj-edit" id="objEdit" hidden>
+            <label>Annuel <input type="text" inputmode="numeric" id="objEditAnnuel"> €</label>
+            <label>Mensuel <input type="text" inputmode="numeric" id="objEditMensuel"> €</label>
+            <div class="obj-edit-actions">
+              <button type="button" class="btn btn-sm" id="objEditCancel">Annuler</button>
+              <button type="button" class="btn btn-sm btn-primary" id="objEditSave">Enregistrer</button>
+            </div>
+          </div>
           <div class="bar-track"><div class="bar-fill pos" id="objFill"></div></div>
           <div class="gauge-sub"><span id="objNow"></span><span id="objStatus"></span></div>
           <div class="sim-row">
@@ -1996,6 +2014,41 @@
     renderContactChips();
   }
 
+  /* ---------------- objectif net annuel modifiable sur la carte ---------------- */
+  function openObjEdit(){
+    var a = Math.round(state.settings.objectifAnnuel)||0;
+    document.getElementById('objEditAnnuel').value = formatThousands(a);
+    document.getElementById('objEditMensuel').value = formatThousands(Math.round(a/12));
+    document.getElementById('objEdit').hidden = false;
+    var i = document.getElementById('objEditMensuel'); i.focus(); i.select();
+  }
+  function closeObjEdit(){ document.getElementById('objEdit').hidden = true; }
+  function saveObjEdit(){
+    var a = parseThousands(document.getElementById('objEditAnnuel').value);
+    if (!a || a <= 0){ toast('Indique un objectif valide.'); return; }
+    state.settings.objectifAnnuel = a;
+    // garder le panneau Paramètres synchronisé (sans toucher à ses autres champs)
+    document.getElementById('cfgObjectif').value = a;
+    document.getElementById('cfgObjectifMensuel').value = Math.round(a/12);
+    closeObjEdit();
+    persistSettings(); // enregistre (Firestore) et redessine la page
+    toast('Objectif : '+formatThousands(a)+' € / an (soit '+formatThousands(Math.round(a/12))+' € / mois) ✓');
+  }
+  function wireObjEdit(){
+    document.getElementById('objEditBtn').addEventListener('click', function(){
+      if (document.getElementById('objEdit').hidden) openObjEdit(); else closeObjEdit();
+    });
+    var an = document.getElementById('objEditAnnuel'), me = document.getElementById('objEditMensuel');
+    an.addEventListener('input', function(){ var v = parseThousands(an.value); me.value = v ? formatThousands(Math.round(v/12)) : ''; });
+    me.addEventListener('input', function(){ var v = parseThousands(me.value); an.value = v ? formatThousands(v*12) : ''; });
+    [an, me].forEach(function(i){ i.addEventListener('keydown', function(e){
+      if (e.key==='Enter'){ e.preventDefault(); saveObjEdit(); }
+      if (e.key==='Escape'){ e.stopPropagation(); closeObjEdit(); }
+    }); });
+    document.getElementById('objEditSave').addEventListener('click', saveObjEdit);
+    document.getElementById('objEditCancel').addEventListener('click', closeObjEdit);
+  }
+
   function saveSettingsFromForm(){
     state.settings.tva = Number(document.getElementById('cfgTva').value)/100;
     state.settings.participation = Number(document.getElementById('cfgParticipation').value)/100;
@@ -2936,6 +2989,7 @@
     });
 
     document.getElementById('btnSaveSettings').addEventListener('click', saveSettingsFromForm);
+    wireObjEdit();
 
     document.getElementById('cfgObjectif').addEventListener('input', function(e){
       var v = Number(e.target.value)||0;
