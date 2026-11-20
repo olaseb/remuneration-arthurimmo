@@ -324,8 +324,11 @@
   table.dossiers tbody tr.row-to-collect:hover td{ filter:brightness(0.96); }
   .to-collect-tag{
     font-size:11px; font-weight:700; color:var(--amber); border:1px solid var(--amber); border-radius:5px;
-    padding:1px 6px; margin-left:6px; white-space:nowrap;
+    padding:1px 6px; margin-left:6px; white-space:nowrap; cursor:pointer; background:none; font-family:inherit;
   }
+  .to-collect-tag:hover{ background:var(--amber-soft); }
+  .collect-confirm{ display:inline-flex; align-items:center; gap:6px; margin-left:6px; font-size:11.5px; color:var(--ink-2); white-space:nowrap; }
+  .collect-confirm .btn{ padding:2px 8px; font-size:11.5px; }
   .empty-row td{ text-align:center; color:var(--ink-3); padding:30px 0; }
   .group-sep td{ background:var(--surface-2); color:var(--ink-3); font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; padding:7px 14px; border-top:1px solid var(--border); }
 
@@ -432,6 +435,13 @@
     color:var(--ink-2); padding:12px 20px; border-top:1px solid var(--border); background:var(--amber-soft); flex-shrink:0;
   }
   .invoice-mark-confirm[hidden]{ display:none; }
+  .invoice-mark-confirm .invoice-mark-names{ flex-basis:100%; text-align:right; font-weight:600; color:var(--ink); }
+  /* question « inclure les dossiers VousFinancer ? » à l'ouverture (20/11/2026) */
+  .invoice-apporteur-ask{ background:var(--amber-soft); border:1px solid var(--amber); border-radius:var(--radius-md); padding:10px 12px; margin-bottom:12px; font-size:13px; color:var(--ink); }
+  .invoice-apporteur-ask[hidden]{ display:none; }
+  .invoice-apporteur-ask .ask-names{ display:block; font-size:12px; color:var(--ink-2); margin-top:3px; }
+  .invoice-apporteur-ask .ask-actions{ display:flex; justify-content:flex-end; gap:8px; margin-top:8px; }
+  .invoice-row-billed{ font-size:10.5px; font-weight:700; color:var(--amber); white-space:nowrap; flex-shrink:0; }
   .invoice-hint{ font-size:12.5px; color:var(--ink-3); margin-bottom:14px; }
   .invoice-empty{ font-size:13px; color:var(--ink-3); padding:14px 0; }
   .invoice-bulk-taux{
@@ -987,12 +997,14 @@
       <input type="number" id="invoiceBulkTauxInput" step="1" min="0" max="100" placeholder="%">
       <button class="btn btn-sm" id="btnApplyBulkTaux">Appliquer</button>
     </div>
+    <div class="invoice-apporteur-ask" id="invoiceApporteurAsk" hidden></div>
     <div class="invoice-select-list" id="invoiceSelectList"></div>
     <div class="invoice-results" id="invoiceResults"></div>
     <div class="invoice-comparison" id="invoiceComparison"></div>
   </div>
   <div class="invoice-mark-confirm" id="invoiceMarkConfirm" hidden>
     <span>Surligner ces dossiers dans le tableau pour penser à cliquer « ✓ Payé » dès que l'argent est reçu&nbsp;?</span>
+    <span class="invoice-mark-names" id="invoiceMarkNames"></span>
     <button type="button" class="btn btn-sm btn-ghost" id="btnMarkInvoicedNo">Non</button>
     <button type="button" class="btn btn-sm btn-primary" id="btnMarkInvoicedYes">Oui, les surligner</button>
   </div>
@@ -1532,7 +1544,9 @@
       // en attente de paiement — rappel visuel pour cliquer « ✓ Payé » dès
       // que l'argent est reçu (demandé par Séb le 09/10/2026).
       var toCollect = d.statut === 'En attente' && !!d.aFacturer;
-      var collectTag = toCollect ? '<span class="to-collect-tag" title="Facture envoyée, en attente d’encaissement">🧾 À encaisser</span>' : '';
+      var collectTag = !toCollect ? '' : (state.collectConfirmId === d.id
+        ? '<span class="collect-confirm" onclick="event.stopPropagation()">Retirer « À encaisser »&nbsp;? <button type="button" class="btn btn-sm btn-primary" data-uncollect-yes="'+d.id+'">Oui</button><button type="button" class="btn btn-sm" data-uncollect-no="'+d.id+'">Non</button></span>'
+        : '<button type="button" class="to-collect-tag" data-uncollect="'+d.id+'" title="Facture envoyée, en attente d’encaissement — cliquer pour retirer ce surlignage">🧾 À encaisser</button>');
       var action = d.statut==='En attente'
         ? '<button class="btn btn-sm mark-paid" data-id="'+d.id+'" title="Marquer comme payé">✓ Payé</button>'
         : '';
@@ -1563,6 +1577,21 @@
       tr.addEventListener('click', function(){
         var d = state.dossiers.find(function(x){ return x.id===tr.getAttribute('data-id'); });
         if (d) openDrawer(d);
+      });
+    });
+    // Retirer le surlignage « À encaisser » (ex. dossier marqué par erreur) — 20/11/2026
+    body.querySelectorAll('[data-uncollect]').forEach(function(btn){
+      btn.addEventListener('click', function(e){ e.stopPropagation(); state.collectConfirmId = btn.getAttribute('data-uncollect'); render(); });
+    });
+    body.querySelectorAll('[data-uncollect-no]').forEach(function(btn){
+      btn.addEventListener('click', function(e){ e.stopPropagation(); state.collectConfirmId = null; render(); });
+    });
+    body.querySelectorAll('[data-uncollect-yes]').forEach(function(btn){
+      btn.addEventListener('click', function(e){
+        e.stopPropagation();
+        var d = state.dossiers.find(function(x){ return x.id === btn.getAttribute('data-uncollect-yes'); });
+        state.collectConfirmId = null;
+        if (d){ d.aFacturer = false; render(); toast('Surlignage retiré : '+d.nom+'.'); persistDossier(d); }
       });
     });
     body.querySelectorAll('.mark-paid').forEach(function(btn){
@@ -2302,6 +2331,7 @@
           '<input type="checkbox" data-invoice-id="'+d.id+'" '+checked+'>' +
           '<span class="invoice-row-name">'+escapeHTML(d.nom)+'</span>' +
           partnerBadge +
+          (d.aFacturer ? '<span class="invoice-row-billed" title="Déjà marqué « À encaisser » dans le tableau">🧾 déjà facturé</span>' : '') +
           '<span class="invoice-row-date">'+escapeHTML(invoiceMoisNotaireLabel(d))+'</span>' +
           '<span class="invoice-row-meta">'+euroSmart(Number(d.honoraires)||0)+'</span>' +
           '<span class="invoice-row-taux">' +
@@ -2404,10 +2434,19 @@
     // demandé par Séb pour ne pas avoir à tout cocher à la main à chaque fois.
     var curKey = currentMonthKey();
     invoiceEligibleDossiers().forEach(function(d){
+      if (d.type === 'APPORTEUR') return; // les VousFinancer : on pose la question (voir plus bas)
       if (d.dateEncaissement && d.dateEncaissement.slice(0, 7) === curKey){
         invoiceHelper.selected[d.id] = true;
       }
     });
+    // Demandé par Séb le 20/11/2026 : les dossiers VousFinancer (APPORTEUR) se facturent à
+    // part et parfois plus tard. S'il y en a à facturer (encaissement prévu ce mois-ci ou un
+    // mois précédent, toujours en attente, pas encore marqués « À encaisser »), on lui demande
+    // s'il veut les inclure ; ils ne sont cochés que s'il répond oui.
+    invoiceHelper.apporteurAsk = invoiceEligibleDossiers().filter(function(d){
+      return d.type === 'APPORTEUR' && !d.aFacturer && d.dateEncaissement && d.dateEncaissement.slice(0, 7) <= curKey;
+    }).map(function(d){ return d.id; });
+    renderApporteurAsk();
     document.getElementById('invoiceMarkConfirm').hidden = true;
     document.getElementById('invoiceModalFoot').hidden = false;
     document.getElementById('invoiceScrim').classList.add('open');
@@ -2415,6 +2454,28 @@
     renderInvoiceSelectList();
     renderInvoiceOutputs();
   }
+  function renderApporteurAsk(){
+    var el = document.getElementById('invoiceApporteurAsk');
+    var ids = invoiceHelper.apporteurAsk || [];
+    if (!ids.length){ el.hidden = true; el.innerHTML = ''; return; }
+    var byId = {}; state.dossiers.forEach(function(d){ byId[d.id] = d; });
+    var names = ids.map(function(id){ var d = byId[id]; return d ? escapeHTML(d.nom)+' ('+escapeHTML(invoiceMoisNotaireLabel(d))+')' : ''; }).filter(Boolean);
+    el.innerHTML = '<strong>Inclure les dossiers VousFinancer dans cette facture&nbsp;?</strong>' +
+      '<span class="ask-names">'+ids.length+' dossier'+(ids.length>1?'s':'')+' à facturer : '+names.join(', ')+'</span>' +
+      '<div class="ask-actions"><button type="button" class="btn btn-sm btn-ghost" id="btnApporteurAskNo">Non</button>' +
+      '<button type="button" class="btn btn-sm btn-primary" id="btnApporteurAskYes">Oui, les cocher</button></div>';
+    el.hidden = false;
+    document.getElementById('btnApporteurAskNo').addEventListener('click', function(){ answerApporteurAsk(false); });
+    document.getElementById('btnApporteurAskYes').addEventListener('click', function(){ answerApporteurAsk(true); });
+  }
+  function answerApporteurAsk(yes){
+    if (yes) (invoiceHelper.apporteurAsk || []).forEach(function(id){ invoiceHelper.selected[id] = true; });
+    invoiceHelper.apporteurAsk = [];
+    renderApporteurAsk();
+    renderInvoiceSelectList();
+    renderInvoiceOutputs();
+  }
+
   function closeInvoiceHelper(){
     document.getElementById('invoiceScrim').classList.remove('open');
     document.getElementById('invoiceModal').classList.remove('open');
@@ -2431,6 +2492,8 @@
   function askMarkInvoiced(){
     var ids = selectedInvoiceIds();
     if (!ids.length){ toast('Coche au moins un dossier à facturer.'); return; }
+    var byId = {}; state.dossiers.forEach(function(d){ byId[d.id] = d; });
+    document.getElementById('invoiceMarkNames').textContent = ids.map(function(id){ return byId[id] ? byId[id].nom : ''; }).filter(Boolean).join(' · ');
     document.getElementById('invoiceModalFoot').hidden = true;
     document.getElementById('invoiceMarkConfirm').hidden = false;
   }
